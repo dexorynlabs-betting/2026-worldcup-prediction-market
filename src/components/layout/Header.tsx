@@ -53,6 +53,7 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-7 text-sm text-fg-2">
           <Link href="/#simulate" className="hover:text-fg-0 transition-colors">{t('nav_simulate')}</Link>
+          <Link href="/backtest" className="hover:text-fg-0 transition-colors">Backtest</Link>
           <Link href="/methodology" className="hover:text-fg-0 transition-colors">{t('nav_methodology')}</Link>
         </nav>
 

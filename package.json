@@ -8,6 +8,7 @@
     "start": "next start",
     "scrape-elo": "tsx scripts/scrape-elo.ts",
     "fetch-odds": "tsx scripts/fetch-odds.ts",
+    "fetch-backtest": "tsx scripts/fetch-backtest.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
