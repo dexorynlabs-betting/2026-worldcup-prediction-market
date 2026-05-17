@@ -61,7 +61,7 @@ export function BracketTree({ result }: Props) {
     locale === 'es' ? team.name_es : team.name_en;
 
   return (
-    <section id="methodology" className="mx-auto max-w-[1440px] px-6 py-20">
+    <section className="mx-auto max-w-[1440px] px-6 py-20">
       <header className="mb-8">
         <h2 className="font-display text-4xl font-bold tracking-tight text-fg-0 sm:text-5xl">{t('title')}</h2>
         <p className="mt-2 text-sm text-fg-2">{t('subtitle')}</p>
