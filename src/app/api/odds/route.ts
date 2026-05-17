@@ -30,13 +30,15 @@ function toTeamId(name: string): string | undefined {
 
 // ---------------------------------------------------------------------------
 // Polymarket — public gamma API, no auth needed.
-// We expect the WC 2026 winner to live as one event with N binary sub-markets,
-// one per team. Each binary market exposes outcomes ["Yes","No"] with the YES
-// price = implied probability the team wins. We also fall back to a multi-
-// outcome market shape where outcomes are team names themselves.
+// The 2026 World Cup winner lives at event `2026-fifa-world-cup-winner-595`
+// (the `-595` suffix is the event ID; Polymarket slugs include the ID).
+// The event nests ~60 binary YES/NO markets, one per team, each with a
+// `groupItemTitle` matching the team name. We use the orderbook midpoint
+// (bestBid+bestAsk)/2 when available — it's more current than lastTradePrice
+// for low-liquidity longshot markets.
 // ---------------------------------------------------------------------------
 async function fromPolymarket(): Promise<MarketOdds[]> {
-  const slug = process.env.POLYMARKET_SLUG || 'fifa-world-cup-2026';
+  const slug = process.env.POLYMARKET_SLUG || '2026-fifa-world-cup-winner-595';
   const url = `https://gamma-api.polymarket.com/events?slug=${encodeURIComponent(slug)}`;
   const res = await fetch(url, { next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`Polymarket: ${res.status} ${res.statusText}`);
@@ -51,65 +53,62 @@ async function fromPolymarket(): Promise<MarketOdds[]> {
       outcomePrices?: string;
       closed?: boolean;
       active?: boolean;
+      bestBid?: number;
+      bestAsk?: number;
+      lastTradePrice?: number;
     }>;
   }>;
 
-  const out: MarketOdds[] = [];
   const candidates: Array<{ teamId: string; price: number }> = [];
 
   for (const ev of data) {
     for (const m of (ev.markets || [])) {
       if (m.closed === true || m.active === false) continue;
-      let outcomes: string[] = [];
-      let prices: number[] = [];
-      try {
-        outcomes = m.outcomes ? JSON.parse(m.outcomes) as string[] : [];
-        prices = m.outcomePrices ? (JSON.parse(m.outcomePrices) as string[]).map(Number) : [];
-      } catch {
-        continue;
-      }
-      if (outcomes.length !== prices.length || outcomes.length === 0) continue;
 
-      // Binary YES/NO market — match team via groupItemTitle or question.
-      const isBinary = outcomes.length === 2 && outcomes.every((o) => /^(yes|no)$/i.test(o));
-      if (isBinary) {
-        const candidateName = m.groupItemTitle || m.question?.match(/(?:will the |will )?([A-Za-zÀ-ÿ' ]+?) win/i)?.[1] || '';
-        const teamId = toTeamId(candidateName);
-        if (!teamId) continue;
-        const yesIdx = outcomes.findIndex((o) => /yes/i.test(o));
-        const yesPrice = prices[yesIdx];
-        if (!Number.isFinite(yesPrice) || yesPrice <= 0 || yesPrice >= 1) continue;
-        candidates.push({ teamId, price: yesPrice });
-        continue;
-      }
+      // Try to identify the team. `groupItemTitle` is the clean team name
+      // ("Spain", "Côte d'Ivoire", etc.); fall back to question regex.
+      const candidateName = m.groupItemTitle
+        || m.question?.match(/(?:will the |will )?([A-Za-zÀ-ÿ' ]+?) win/i)?.[1]
+        || '';
+      const teamId = toTeamId(candidateName);
+      if (!teamId) continue;
 
-      // Multi-outcome single market — outcomes ARE team names.
-      outcomes.forEach((name, i) => {
-        const teamId = toTeamId(name);
-        const p = prices[i];
-        if (!teamId || !Number.isFinite(p) || p <= 0 || p >= 1) return;
-        candidates.push({ teamId, price: p });
-      });
+      // Pricing: orderbook midpoint > last trade > outcomePrices YES leg.
+      let price: number | null = null;
+      if (typeof m.bestBid === 'number' && typeof m.bestAsk === 'number'
+          && m.bestBid > 0 && m.bestAsk > 0) {
+        price = (m.bestBid + m.bestAsk) / 2;
+      } else if (typeof m.lastTradePrice === 'number' && m.lastTradePrice > 0) {
+        price = m.lastTradePrice;
+      } else if (m.outcomes && m.outcomePrices) {
+        try {
+          const outcomes = JSON.parse(m.outcomes) as string[];
+          const prices = (JSON.parse(m.outcomePrices) as string[]).map(Number);
+          const yesIdx = outcomes.findIndex((o) => /^yes$/i.test(o));
+          if (yesIdx >= 0 && Number.isFinite(prices[yesIdx])) price = prices[yesIdx];
+        } catch {
+          // fall through — no price
+        }
+      }
+      if (price === null || !Number.isFinite(price) || price <= 0 || price >= 1) continue;
+      candidates.push({ teamId, price });
     }
   }
 
-  if (candidates.length === 0) return out;
+  if (candidates.length === 0) return [];
 
   // De-vig across the implied YES probabilities so they sum to 1.
   const implied = candidates.map((c) => c.price);
   const fair = devig(implied);
-  candidates.forEach((c, i) => {
-    out.push({
-      market: 'winner',
-      team_id: c.teamId,
-      book: 'polymarket',
-      decimal_odds: 1 / c.price,
-      implied_prob: c.price,
-      fair_prob: fair[i],
-      fetched_at: new Date().toISOString(),
-    });
-  });
-  return out;
+  return candidates.map((c, i) => ({
+    market: 'winner' as const,
+    team_id: c.teamId,
+    book: 'polymarket',
+    decimal_odds: 1 / c.price,
+    implied_prob: c.price,
+    fair_prob: fair[i],
+    fetched_at: new Date().toISOString(),
+  }));
 }
 
 // ---------------------------------------------------------------------------
