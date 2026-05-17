@@ -51,9 +51,15 @@ export function Hero({ state, onRun }: HeroProps) {
                 <span key={i} data-word className="inline-block mr-[0.2em]">{w}</span>
               ))}
             </span>
-            <span className="block bg-gradient-to-r from-gold via-gold-hi to-gold bg-clip-text text-transparent">
+            <span className="block">
               {t('title_part2').split(' ').map((w, i) => (
-                <span key={i} data-word className="inline-block mr-[0.2em]">{w}</span>
+                <span
+                  key={i}
+                  data-word
+                  className="inline-block mr-[0.2em] bg-gradient-to-r from-gold via-gold-hi to-gold bg-clip-text text-transparent"
+                >
+                  {w}
+                </span>
               ))}
             </span>
           </h1>

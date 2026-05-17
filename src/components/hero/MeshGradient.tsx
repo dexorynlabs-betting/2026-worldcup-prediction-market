@@ -22,7 +22,7 @@ export function MeshGradient() {
     return () => window.removeEventListener('pointermove', onMove);
   }, []);
 
-  const fadeMask = 'linear-gradient(to bottom, black 0%, black 20%, transparent 78%)';
+  const fadeMask = 'linear-gradient(to bottom, black 0%, black 10%, transparent 65%)';
 
   return (
     <div
