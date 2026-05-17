@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Simulador Mundial 2026",
+    "description": "Monte Carlo con ELO + Poisson. 100.000 simulaciones del Mundial 2026."
+  },
+  "header": {
+    "brand": "Mundial 2026 · Simulador",
+    "nav_simulate": "Simular",
+    "nav_methodology": "Metodología",
+    "nav_about": "Acerca",
+    "lang_es": "ES",
+    "lang_en": "EN"
+  },
+  "hero": {
+    "eyebrow": "100.000 SIMULACIONES · MONTE CARLO · ELO",
+    "title_part1": "¿Quién levanta",
+    "title_part2": "la Copa?",
+    "subtitle": "Modelo basado en ELO y goles Poisson. 48 equipos, 104 partidos, miles de millones de escenarios — vos elegís cuántos simulamos.",
+    "stat_matches": "partidos",
+    "stat_teams": "equipos",
+    "stat_scenarios": "escenarios posibles",
+    "cta_simulate": "Simular",
+    "cta_simulating": "Simulando…",
+    "cta_finished": "Simular de nuevo",
+    "progress": "{done} / {total}",
+    "eta_seconds": "{seconds}s restantes"
+  },
+  "controls": {
+    "label": "Cantidad de simulaciones"
+  },
+  "champion": {
+    "title": "¿Quién levanta la copa?",
+    "subtitle": "Probabilidad de campeón sobre {n} simulaciones.",
+    "most_likely": "MÁS PROBABLE",
+    "stat_elo": "ELO",
+    "stat_avg_matches": "Partidos esperados",
+    "stat_avg_gd": "DG promedio"
+  },
+  "stages": {
+    "title": "Probabilidad por etapa",
+    "subtitle": "Probabilidad de cada selección de llegar a cada ronda.",
+    "r32": "Oct. (R32)",
+    "r16": "16vos",
+    "qf": "QF",
+    "sf": "SF",
+    "final": "Final",
+    "champ": "Campeón",
+    "filter_all": "Todos",
+    "filter_top16": "Top 16",
+    "filter_southam": "Sudamérica",
+    "filter_europe": "Europa",
+    "filter_hosts": "Anfitriones",
+    "filter_underdogs": "Underdogs"
+  },
+  "groups": {
+    "title": "Grupos",
+    "subtitle": "Probabilidad de salir 1°, 2°, 3° (clasificando) o eliminado.",
+    "group": "Grupo",
+    "qualifies": "Clasifica",
+    "as_best_third": "Como mejor 3°",
+    "eliminated": "Eliminado"
+  },
+  "bracket": {
+    "title": "Bracket más probable",
+    "subtitle": "Camino del campeón más frecuente.",
+    "hover_hint": "Pasá el cursor sobre cada partido para ver su probabilidad."
+  },
+  "goals": {
+    "title": "Goles",
+    "subtitle": "Distribución de goles totales del torneo.",
+    "top_scoring": "Selecciones más goleadoras",
+    "avg_per_tournament": "promedio por torneo"
+  },
+  "surprises": {
+    "title": "Sorpresas",
+    "subtitle": "Resultados estadísticamente improbables pero posibles.",
+    "underdog_label": "{team} llega a {stage}",
+    "favorite_falls": "{team} no pasa de grupos"
+  },
+  "footer": {
+    "credits": "Datos ELO: eloratings.net · Sorteo: FIFA",
+    "methodology_link": "Ver metodología",
+    "share": "Compartir"
+  },
+  "methodology": {
+    "title": "Metodología",
+    "section_elo": "Ratings ELO",
+    "section_poisson": "Modelo de goles",
+    "section_groups": "Fase de grupos",
+    "section_knockout": "Eliminatoria",
+    "section_montecarlo": "Monte Carlo"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "World Cup 2026 Simulator",
+    "description": "Monte Carlo with ELO + Poisson. 100,000 simulations of the FIFA World Cup 2026."
+  },
+  "header": {
+    "brand": "World Cup 2026 · Simulator",
+    "nav_simulate": "Simulate",
+    "nav_methodology": "Methodology",
+    "nav_about": "About",
+    "lang_es": "ES",
+    "lang_en": "EN"
+  },
+  "hero": {
+    "eyebrow": "100,000 SIMULATIONS · MONTE CARLO · ELO",
+    "title_part1": "Who lifts",
+    "title_part2": "the Cup?",
+    "subtitle": "ELO-based model with Poisson goals. 48 teams, 104 matches, billions of possible outcomes — you choose how many we simulate.",
+    "stat_matches": "matches",
+    "stat_teams": "teams",
+    "stat_scenarios": "possible outcomes",
+    "cta_simulate": "Simulate",
+    "cta_simulating": "Simulating…",
+    "cta_finished": "Run again",
+    "progress": "{done} / {total}",
+    "eta_seconds": "{seconds}s remaining"
+  },
+  "controls": {
+    "label": "Number of simulations"
+  },
+  "champion": {
+    "title": "Who lifts the cup?",
+    "subtitle": "Championship probability over {n} simulations.",
+    "most_likely": "MOST LIKELY",
+    "stat_elo": "ELO",
+    "stat_avg_matches": "Expected matches",
+    "stat_avg_gd": "Avg GD"
+  },
+  "stages": {
+    "title": "Stage probabilities",
+    "subtitle": "Probability of each team reaching each round.",
+    "r32": "R32",
+    "r16": "R16",
+    "qf": "QF",
+    "sf": "SF",
+    "final": "Final",
+    "champ": "Champion",
+    "filter_all": "All",
+    "filter_top16": "Top 16",
+    "filter_southam": "S. America",
+    "filter_europe": "Europe",
+    "filter_hosts": "Hosts",
+    "filter_underdogs": "Underdogs"
+  },
+  "groups": {
+    "title": "Groups",
+    "subtitle": "Probability of finishing 1st, 2nd, 3rd (advancing), or eliminated.",
+    "group": "Group",
+    "qualifies": "Qualifies",
+    "as_best_third": "As best 3rd",
+    "eliminated": "Eliminated"
+  },
+  "bracket": {
+    "title": "Most likely bracket",
+    "subtitle": "Most frequent path to the cup.",
+    "hover_hint": "Hover any match for its probability."
+  },
+  "goals": {
+    "title": "Goals",
+    "subtitle": "Distribution of total tournament goals.",
+    "top_scoring": "Top scoring teams",
+    "avg_per_tournament": "avg per tournament"
+  },
+  "surprises": {
+    "title": "Surprises",
+    "subtitle": "Statistically unlikely but possible outcomes.",
+    "underdog_label": "{team} reaches {stage}",
+    "favorite_falls": "{team} fails to advance from groups"
+  },
+  "footer": {
+    "credits": "ELO data: eloratings.net · Draw: FIFA",
+    "methodology_link": "See methodology",
+    "share": "Share"
+  },
+  "methodology": {
+    "title": "Methodology",
+    "section_elo": "ELO ratings",
+    "section_poisson": "Goal model",
+    "section_groups": "Group stage",
+    "section_knockout": "Knockout",
+    "section_montecarlo": "Monte Carlo"
+  }
+}
