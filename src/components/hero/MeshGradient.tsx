@@ -22,25 +22,24 @@ export function MeshGradient() {
     return () => window.removeEventListener('pointermove', onMove);
   }, []);
 
+  const fadeMask = 'linear-gradient(to bottom, black 0%, black 20%, transparent 78%)';
+
   return (
     <div
       ref={ref}
       className="absolute inset-0 -z-10 overflow-hidden"
-      style={{
-        maskImage: 'linear-gradient(to bottom, black 0%, black 55%, transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 55%, transparent 100%)',
-      }}
+      style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
       aria-hidden
     >
       <div
-        className="absolute top-[15%] left-[10%] h-[640px] w-[640px] rounded-full opacity-50 mix-blend-screen blur-[120px] motion-safe:animate-[drift1_22s_ease-in-out_infinite]"
+        className="absolute top-[10%] left-[5%] h-[640px] w-[640px] rounded-full opacity-50 blur-[120px] motion-safe:animate-[drift1_22s_ease-in-out_infinite]"
         style={{
           background: 'radial-gradient(circle at 50% 50%, oklch(0.80 0.18 75 / 0.55), transparent 65%)',
           transform: 'translate(var(--mx, 0px), var(--my, 0px))',
         }}
       />
       <div
-        className="absolute bottom-[8%] right-[5%] h-[720px] w-[720px] rounded-full opacity-50 mix-blend-screen blur-[140px] motion-safe:animate-[drift2_28s_ease-in-out_infinite]"
+        className="absolute top-[5%] right-[5%] h-[720px] w-[720px] rounded-full opacity-40 blur-[140px] motion-safe:animate-[drift2_28s_ease-in-out_infinite]"
         style={{
           background: 'radial-gradient(circle at 50% 50%, oklch(0.65 0.20 295 / 0.45), transparent 65%)',
           transform: 'translate(calc(-1 * var(--mx, 0px)), calc(-1 * var(--my, 0px)))',

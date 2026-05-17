@@ -32,7 +32,7 @@ export function Hero({ state, onRun }: HeroProps) {
   }, []);
 
   return (
-    <section className="relative isolate overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-24">
+    <section className="relative overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-24">
       <MeshGradient />
 
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-10 px-6 lg:grid-cols-[1.35fr_1fr] lg:gap-16">
