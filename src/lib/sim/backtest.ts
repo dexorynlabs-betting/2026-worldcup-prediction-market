@@ -154,14 +154,25 @@ export interface BacktestResult {
   scored: ScoredMatch[];
 }
 
-function scoreMatch(m: RawMatch, year: number, hostId: string, elo: Record<string, number>): ScoredMatch | null {
+export interface BacktestOptions {
+  /** ELO points added to the host team when they play (default: HOST_BONUS = 100). */
+  hostBonus?: number;
+  /** Apply the host bonus in knockout matches too, not only group stage (default: false). */
+  applyInKO?: boolean;
+}
+
+function scoreMatch(
+  m: RawMatch, year: number, hostId: string, elo: Record<string, number>,
+  opts: Required<BacktestOptions>,
+): ScoredMatch | null {
   const eloH = elo[m.home];
   const eloA = elo[m.away];
   if (eloH === undefined || eloA === undefined) return null;
 
-  // Host bonus matches engine rule: only in group stage, only if team is host.
-  const bonusH = m.stage === 'group' && m.home === hostId ? HOST_BONUS : 0;
-  const bonusA = m.stage === 'group' && m.away === hostId ? HOST_BONUS : 0;
+  // Host bonus: configurable value + whether to apply in KO.
+  const inHostMatch = opts.applyInKO || m.stage === 'group';
+  const bonusH = inHostMatch && m.home === hostId ? opts.hostBonus : 0;
+  const bonusA = inHostMatch && m.away === hostId ? opts.hostBonus : 0;
 
   const pred = predictMatch(eloH, eloA, bonusH, bonusA);
   const observedClass: 0 | 1 | 2 = m.gh > m.ga ? 0 : m.gh === m.ga ? 1 : 2;
@@ -226,7 +237,11 @@ function buildCalibration(scored: ScoredMatch[]): CalibrationBucket[] {
   }));
 }
 
-export function runBacktest(): BacktestResult {
+export function runBacktest(options: BacktestOptions = {}): BacktestResult {
+  const opts: Required<BacktestOptions> = {
+    hostBonus: options.hostBonus ?? HOST_BONUS,
+    applyInKO: options.applyInKO ?? false,
+  };
   const file = backtestData as unknown as BacktestFile;
   const scored: ScoredMatch[] = [];
   const perTournament: BacktestResult['perTournament'] = [];
@@ -234,7 +249,7 @@ export function runBacktest(): BacktestResult {
   for (const t of file.tournaments) {
     const tScored: ScoredMatch[] = [];
     for (const m of t.matches) {
-      const s = scoreMatch(m, t.year, t.host_id, t.elo);
+      const s = scoreMatch(m, t.year, t.host_id, t.elo, opts);
       if (s) tScored.push(s);
     }
     scored.push(...tScored);
@@ -259,4 +274,46 @@ export function runBacktest(): BacktestResult {
     bestCalls,
     scored,
   };
+}
+
+/**
+ * Sweep the host-bonus value to find the empirical optimum on the backtest set.
+ *
+ * Returns two metric series for each bonus value:
+ *   - `overall`: Brier / accuracy across all 192 matches (diluted — only ~22
+ *     matches actually involve a host team across the 3 WCs).
+ *   - `hostOnly`: same metrics restricted to matches where one team is the
+ *     host nation. This is where the bonus actually changes predictions, so
+ *     the effect size is much bigger and easier to read.
+ *
+ * Two flavors per bonus value:
+ *   - `applyInKO=false` (current engine rule — group only)
+ *   - `applyInKO=true`  (proposed: also boost in knockout)
+ */
+export interface SweepPoint {
+  hostBonus: number;
+  applyInKO: boolean;
+  overall: Aggregate;
+  hostOnly: Aggregate;
+}
+
+const HOST_IDS = new Set<string>();
+
+export function runBonusSweep(values: number[] = [0, 50, 80, 100, 120, 150, 180, 220]): SweepPoint[] {
+  const file = backtestData as unknown as BacktestFile;
+  if (HOST_IDS.size === 0) {
+    for (const t of file.tournaments) HOST_IDS.add(t.host_id);
+  }
+
+  const isHostMatch = (m: ScoredMatch) => HOST_IDS.has(m.home) || HOST_IDS.has(m.away);
+
+  const out: SweepPoint[] = [];
+  for (const applyInKO of [false, true]) {
+    for (const hostBonus of values) {
+      const r = runBacktest({ hostBonus, applyInKO });
+      const hostOnly = aggregate(r.scored.filter(isHostMatch));
+      out.push({ hostBonus, applyInKO, overall: r.overall, hostOnly });
+    }
+  }
+  return out;
 }

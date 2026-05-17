@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { ArrowLeft } from 'lucide-react';
-import { runBacktest, type CalibrationBucket, type ScoredMatch } from '@/lib/sim/backtest';
+import { runBacktest, runBonusSweep, type CalibrationBucket, type ScoredMatch, type SweepPoint } from '@/lib/sim/backtest';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-static';
@@ -10,6 +10,7 @@ export default async function BacktestPage({ params }: { params: Promise<{ local
   const { locale } = await params;
   setRequestLocale(locale);
   const r = runBacktest();
+  const sweep = runBonusSweep();
 
   return (
     <article className="relative mx-auto max-w-[1100px] px-6 pt-32 pb-32">
@@ -130,6 +131,36 @@ export default async function BacktestPage({ params }: { params: Promise<{ local
         <CalibrationPlot buckets={r.calibration} />
       </Section>
 
+      <Section title="Sweep · Host bonus">
+        <p className="mb-4 max-w-3xl text-sm text-fg-2">
+          El modelo actual le da <span className="text-fg-1 font-medium">+100 ELO</span> al equipo
+          anfitrión solo en fase de grupos. Probamos varios valores (0 a 220) y dos políticas
+          (solo grupos vs grupos + KO) para ver cuál minimiza Brier. Los <span className="text-fg-1">28
+          partidos donde uno de los equipos es anfitrión</span> son los que cambian — el resto del dataset
+          se mueve solo por efecto de redondeo.
+        </p>
+        <SweepChart points={sweep} />
+        <div className="mt-5 max-w-3xl space-y-3 text-sm text-fg-2">
+          <p>
+            <span className="text-rose font-medium">Counter-intuición:</span> aumentar el bonus
+            <strong className="text-fg-1"> empeora </strong>
+            marginalmente el Brier en cada paso (0.595 → 0.608 al saltar de 0 a 220). Aplicarlo también
+            en KO empeora aún más.
+          </p>
+          <p>
+            <span className="text-fg-1">Pero</span> con n=28 partidos el error estándar de Brier es
+            ~0.09 — todos los valores del sweep están dentro del ruido. Direccionalmente sugiere
+            "menos bonus" pero no es estadísticamente decisivo. Los 3 hosts del set (BRA-2014, RUS-2018,
+            QAT-2022) eran o ya-favoritos o demasiado débiles para que el bonus genérico ayudara.
+          </p>
+          <p className="text-fg-3">
+            <strong>Próximo paso para concluir:</strong> expandir el backtest a Mundiales 1990-2010 (+6
+            torneos = +36 partidos de host). Ahí sí va a haber poder estadístico para confirmar o
+            descartar el bonus actual.
+          </p>
+        </div>
+      </Section>
+
       <Section title="Peores predicciones — el modelo no vio venir">
         <MissList matches={r.worstMisses} kind="miss" />
         <p className="mt-3 text-xs leading-relaxed text-fg-3">
@@ -217,6 +248,74 @@ function Stat({ label, value, subtitle, tone }: { label: string; value: string; 
         {value}
       </div>
       <div className="mt-1 font-mono text-[10px] text-fg-3">{subtitle}</div>
+    </div>
+  );
+}
+
+function SweepChart({ points }: { points: SweepPoint[] }) {
+  const W = 720, H = 280, PAD_L = 56, PAD_R = 24, PAD_T = 20, PAD_B = 44;
+  const series = {
+    groupOnly: points.filter((p) => !p.applyInKO),
+    plusKO:    points.filter((p) =>  p.applyInKO),
+  };
+  const bonuses = series.groupOnly.map((p) => p.hostBonus);
+  const minBonus = Math.min(...bonuses), maxBonus = Math.max(...bonuses);
+  const allBrier = points.map((p) => p.hostOnly.brier);
+  const minY = Math.min(...allBrier) - 0.005;
+  const maxY = Math.max(...allBrier) + 0.005;
+
+  const x = (b: number) => PAD_L + (b - minBonus) / (maxBonus - minBonus) * (W - PAD_L - PAD_R);
+  const y = (br: number) => PAD_T + (maxY - br) / (maxY - minY) * (H - PAD_T - PAD_B);
+
+  const path = (pts: SweepPoint[]) => pts.map((p, i) =>
+    (i === 0 ? 'M' : 'L') + ' ' + x(p.hostBonus).toFixed(1) + ' ' + y(p.hostOnly.brier).toFixed(1)
+  ).join(' ');
+
+  return (
+    <div className="rounded-2xl border border-border glass p-6">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-[280px] w-full">
+        {/* axes */}
+        <line x1={PAD_L} y1={H - PAD_B} x2={W - PAD_R} y2={H - PAD_B} stroke="oklch(0.34 0.04 180)" strokeWidth={1} />
+        <line x1={PAD_L} y1={PAD_T} x2={PAD_L} y2={H - PAD_B} stroke="oklch(0.34 0.04 180)" strokeWidth={1} />
+        {/* x ticks */}
+        {bonuses.map((b) => (
+          <g key={`xt-${b}`}>
+            <line x1={x(b)} x2={x(b)} y1={H - PAD_B} y2={H - PAD_B + 4} stroke="oklch(0.34 0.04 180)" />
+            <text x={x(b)} y={H - PAD_B + 16} fontSize={10} fontFamily="JetBrains Mono, monospace" fill="oklch(0.62 0.018 180)" textAnchor="middle">{b}</text>
+          </g>
+        ))}
+        {/* y ticks (5 evenly spaced) */}
+        {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+          const v = minY + t * (maxY - minY);
+          return (
+            <g key={`yt-${t}`}>
+              <line x1={PAD_L - 4} x2={PAD_L} y1={y(v)} y2={y(v)} stroke="oklch(0.34 0.04 180)" />
+              <text x={PAD_L - 8} y={y(v) + 3} fontSize={10} fontFamily="JetBrains Mono, monospace" fill="oklch(0.62 0.018 180)" textAnchor="end">{v.toFixed(3)}</text>
+            </g>
+          );
+        })}
+        {/* axis titles */}
+        <text x={(W + PAD_L - PAD_R) / 2} y={H - 6} fontSize={11} fontFamily="JetBrains Mono, monospace" fill="oklch(0.46 0.02 180)" textAnchor="middle">host bonus (ELO points)</text>
+        <text x={14} y={(H - PAD_B + PAD_T) / 2} fontSize={11} fontFamily="JetBrains Mono, monospace" fill="oklch(0.46 0.02 180)" textAnchor="middle" transform={`rotate(-90 14 ${(H - PAD_B + PAD_T) / 2})`}>Brier (host-only, n=28)</text>
+
+        {/* group-only line (default behavior) */}
+        <path d={path(series.groupOnly)} stroke="oklch(0.66 0.10 180)" strokeWidth={2} fill="none" />
+        {series.groupOnly.map((p) => (
+          <circle key={`g-${p.hostBonus}`} cx={x(p.hostBonus)} cy={y(p.hostOnly.brier)} r={3.5} fill="oklch(0.66 0.10 180)" />
+        ))}
+        {/* plus-KO line */}
+        <path d={path(series.plusKO)} stroke="oklch(0.65 0.22 18)" strokeWidth={2} fill="none" strokeDasharray="4 3" />
+        {series.plusKO.map((p) => (
+          <circle key={`k-${p.hostBonus}`} cx={x(p.hostBonus)} cy={y(p.hostOnly.brier)} r={3.5} fill="oklch(0.65 0.22 18)" />
+        ))}
+        {/* current marker */}
+        <line x1={x(100)} x2={x(100)} y1={PAD_T} y2={H - PAD_B} stroke="oklch(0.62 0.018 180)" strokeDasharray="2 3" strokeWidth={1} />
+        <text x={x(100) + 4} y={PAD_T + 10} fontSize={9} fontFamily="JetBrains Mono, monospace" fill="oklch(0.62 0.018 180)">actual (100)</text>
+      </svg>
+      <div className="mt-2 flex justify-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-fg-2">
+        <span className="flex items-center gap-2"><span className="h-0.5 w-5 bg-gold" />solo grupos</span>
+        <span className="flex items-center gap-2"><span className="h-0.5 w-5 bg-rose" style={{ borderTop: '1px dashed' }} />grupos + KO</span>
+      </div>
     </div>
   );
 }
