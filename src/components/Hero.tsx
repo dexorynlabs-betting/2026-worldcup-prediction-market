@@ -1,12 +1,20 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { SimulationControls } from './SimulationControls';
-import { TrophyCanvas } from './hero/TrophyCanvas';
 import { MeshGradient } from './hero/MeshGradient';
 import type { SimState } from '@/hooks/useSimulation';
+
+// R3F + drei still peer-deps React 18; even with React 19 it works, but only
+// when loaded purely client-side. SSR causes hydration crashes — render the
+// canvas only after mount.
+const TrophyCanvas = dynamic(
+  () => import('./hero/TrophyCanvas').then((m) => m.TrophyCanvas),
+  { ssr: false, loading: () => null },
+);
 
 interface HeroProps {
   state: SimState;

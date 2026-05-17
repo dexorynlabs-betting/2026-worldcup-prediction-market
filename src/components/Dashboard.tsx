@@ -16,10 +16,8 @@ export function Dashboard() {
   const lastStatus = useRef(state.status);
 
   useEffect(() => {
-    // Confetti when sim completes successfully
     if (state.status === 'done' && lastStatus.current !== 'done') {
       fireConfetti();
-      // Smooth scroll to results.
       setTimeout(() => {
         document.getElementById('champion')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 250);

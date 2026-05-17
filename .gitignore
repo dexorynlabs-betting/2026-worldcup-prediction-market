@@ -9,3 +9,5 @@ out/
 next-env.d.ts
 .turbo/
 coverage/
+
+.vercel
