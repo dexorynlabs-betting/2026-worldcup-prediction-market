@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { Flag } from './Flag';
 import { cn, formatPct } from '@/lib/utils';
+import { useSelection } from '@/hooks/useSelection';
 import type { SerializedResult } from '@/lib/sim/worker';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 export function ChampionProbBar({ result }: Props) {
   const t = useTranslations('champion');
   const containerRef = useRef<HTMLDivElement>(null);
+  const openTeam = useSelection((s) => s.openTeam);
 
   const rows = result.teams
     .map((team, i) => ({
@@ -59,12 +61,13 @@ export function ChampionProbBar({ result }: Props) {
 
       <div ref={containerRef} className="space-y-2">
         {rows.map((r, i) => (
-          <div
+          <button
             key={r.team.id}
+            onClick={() => openTeam(r.team.id)}
             className={cn(
-              'group relative grid grid-cols-[auto_140px_1fr_72px] items-center gap-3 rounded-xl border px-3 py-2 transition-all',
+              'group relative grid w-full grid-cols-[auto_140px_1fr_72px] items-center gap-3 rounded-xl border px-3 py-2 text-left transition-all',
               i === 0
-                ? 'border-gold/40 bg-gradient-to-r from-gold/10 to-transparent'
+                ? 'border-gold/40 bg-gradient-to-r from-gold/10 to-transparent hover:border-gold/60'
                 : 'border-border bg-bg-1/30 hover:bg-bg-1/60 hover:border-border-strong',
             )}
           >
@@ -120,7 +123,7 @@ export function ChampionProbBar({ result }: Props) {
                 <span className="font-mono tabular text-rose">{r.avgGA.toFixed(1)}</span>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </section>

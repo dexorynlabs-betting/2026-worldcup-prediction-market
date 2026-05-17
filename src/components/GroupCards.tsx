@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Flag } from './Flag';
 import { cn, formatPct } from '@/lib/utils';
+import { useSelection } from '@/hooks/useSelection';
 import type { SerializedResult } from '@/lib/sim/worker';
 import groupsData from '@/data/groups.json';
 
@@ -14,6 +15,7 @@ const GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L'] as const
 export function GroupCards({ result }: Props) {
   const t = useTranslations('groups');
   const locale = useLocale();
+  const openTeam = useSelection((s) => s.openTeam);
   const idxOf = useMemo(() => new Map(result.teams.map((x, i) => [x.id, i])), [result]);
 
   /**
@@ -69,7 +71,11 @@ export function GroupCards({ result }: Props) {
               {teams.map((t2) => {
                 const pct = t2.pAdvance * 100;
                 return (
-                  <div key={t2.id} className="space-y-1">
+                  <button
+                    key={t2.id}
+                    onClick={() => openTeam(t2.id)}
+                    className="block w-full space-y-1 rounded-md text-left transition-colors hover:bg-bg-2/40 px-1 py-1 -mx-1"
+                  >
                     <div className="flex items-center justify-between gap-2 text-sm">
                       <div className="flex min-w-0 items-center gap-2">
                         <Flag code={t2.team.flag} size={18} />
@@ -98,7 +104,7 @@ export function GroupCards({ result }: Props) {
                         }}
                       />
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

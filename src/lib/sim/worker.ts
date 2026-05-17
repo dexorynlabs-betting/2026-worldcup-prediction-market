@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { runSimulations } from './engine';
-import type { AggregateResult } from './types';
+import type { AggregateResult, MatchAggregateSerialized } from './types';
 
 export type WorkerInbound =
   | { type: 'run'; numSimulations: number; seed?: number };
@@ -42,10 +42,18 @@ export interface SerializedResult {
     fourth: number[];
   };
   tournamentGoalsHistogram: number[];
+  /** Each [key, fixture] entry from the engine's fixtures Map. */
+  fixtures: Array<[string, MatchAggregateSerialized]>;
+  /** Each [key, totalGoals] entry from the scorers Map. */
+  scorers: Array<[string, number]>;
 }
 
 function serialize(agg: AggregateResult): SerializedResult {
   const ta = (arr: Int32Array | Float64Array) => Array.from(arr);
+  const fixtures: Array<[string, MatchAggregateSerialized]> = [];
+  for (const [k, f] of agg.fixtures) {
+    fixtures.push([k, { ...f, scoreHist: Array.from(f.scoreHist) }]);
+  }
   return {
     numSimulations: agg.numSimulations,
     teams: agg.teams,
@@ -68,6 +76,8 @@ function serialize(agg: AggregateResult): SerializedResult {
       fourth:        ta(agg.groupFinish.fourth),
     },
     tournamentGoalsHistogram: ta(agg.tournamentGoalsHistogram),
+    fixtures,
+    scorers: Array.from(agg.scorers.entries()),
   };
 }
 

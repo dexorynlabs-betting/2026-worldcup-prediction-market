@@ -1,4 +1,4 @@
-import type { Team, TournamentResult, Stage } from './types';
+import type { Team, TournamentResult, Stage, GroupFinish } from './types';
 import { simulateGroup, compareStandings, type TeamStanding } from './group';
 import { simulateKnockout } from './knockout';
 import type { XoshiroRNG } from './rng';
@@ -34,13 +34,32 @@ const BRACKET = bracketData as unknown as {
  *  3) Assign the 8 advancing 3rd-placed teams to the 8 "best 3rd" slots in R32 (simplified rule).
  *  4) Play R32 → R16 → QF → SF → 3rd-place + Final.
  */
+/**
+ * Fixture-event callback. Called once per match in a simulated tournament,
+ * with enough info for the engine to accumulate per-fixture aggregates.
+ *
+ * - For group matches: stage='group', group=A..L, slotId='A:0'..'L:5'.
+ * - For knockout matches: stage='r32'..'final'/'3rd', slotId=match.id as string.
+ */
+export type OnFixture = (
+  stage: 'group' | 'r32' | 'r16' | 'qf' | 'sf' | 'final' | '3rd',
+  slotId: string,
+  group: string | undefined,
+  homeIdx: number,
+  awayIdx: number,
+  gh: number,
+  ga: number,
+) => void;
+
 export function simulateTournament(
   teams: Team[],
   teamIdx: Map<string, number>,
   rng: XoshiroRNG,
+  onFixture?: OnFixture,
 ): TournamentResult {
   const N = teams.length;
   const stageReached: Stage[] = new Array(N).fill('group');
+  const groupFinish: GroupFinish[] = new Array(N).fill('fourth');
   const goalsFor = new Int32Array(N);
   const goalsAgainst = new Int32Array(N);
 
@@ -53,13 +72,12 @@ export function simulateTournament(
       if (i === undefined) throw new Error(`Unknown team id in group ${letter}: ${id}`);
       return i;
     });
-    const standings = simulateGroup(idxs, teams, rng, (h, a, gh, ga) => {
+    const standings = simulateGroup(idxs, teams, rng, (pairIdx, h, a, gh, ga) => {
       goalsFor[h] += gh; goalsAgainst[h] += ga;
       goalsFor[a] += ga; goalsAgainst[a] += gh;
+      onFixture?.('group', `${letter}:${pairIdx}`, letter, h, a, gh, ga);
     });
     groupStandings[letter] = standings;
-    // Mark stage reached for group teams (the ones who don't advance stay at 'group')
-    // We'll bump advancing teams later.
   }
 
   // === 2) Rank the 12 third-placed teams; top 8 advance ===
@@ -72,16 +90,23 @@ export function simulateTournament(
   const advancingThirds = thirds.slice(0, 8);
   const eliminatedThirds = thirds.slice(8);
 
-  // Mark group-finish stage
+  // Mark group-finish position and stage
   for (const letter of GROUP_LETTERS) {
     const s = groupStandings[letter];
     stageReached[s[0].teamIdx] = 'r32';
     stageReached[s[1].teamIdx] = 'r32';
-    // s[2] depends on advancing
-    stageReached[s[3].teamIdx] = 'group';
+    groupFinish[s[0].teamIdx] = 'first';
+    groupFinish[s[1].teamIdx] = 'second';
+    groupFinish[s[3].teamIdx] = 'fourth';
   }
-  for (const t of advancingThirds) stageReached[t.standing.teamIdx] = 'r32';
-  for (const t of eliminatedThirds) stageReached[t.standing.teamIdx] = 'group';
+  for (const t of advancingThirds) {
+    stageReached[t.standing.teamIdx] = 'r32';
+    groupFinish[t.standing.teamIdx] = 'thirdAdvances';
+  }
+  for (const t of eliminatedThirds) {
+    stageReached[t.standing.teamIdx] = 'group';
+    groupFinish[t.standing.teamIdx] = 'thirdOut';
+  }
 
   // === 3) Assign 8 advancing 3rd-placed teams to bracket "third_from" slots ===
   // Simplification: for each R32 slot demanding a "best 3rd from groups X,Y,...":
@@ -142,27 +167,26 @@ export function simulateTournament(
   };
 
   // === 4) Run knockout rounds ===
-  const runRound = (matches: BracketSlot[], reachedStage: Stage, nextStage: Stage) => {
+  const runRound = (matches: BracketSlot[], reachedStage: Stage, nextStage: Stage, fixtureStage: 'r32'|'r16'|'qf'|'sf'|'final'|'3rd') => {
     for (const m of matches) {
       const homeIdx = resolveSlot(m.home, m.id, 'home');
       const awayIdx = resolveSlot(m.away, m.id, 'away');
       const r = simulateKnockout(homeIdx, awayIdx, teams, rng);
       matchWinner.set(m.id, r.winnerIdx);
       matchLoser.set(m.id, r.loserIdx);
-      // Goals from regulation count toward stats (penalties excluded since drawn games have gh==ga).
       goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
       goalsFor[awayIdx] += r.ga; goalsAgainst[awayIdx] += r.gh;
-      // Both teams reached `reachedStage`. Winner gets bumped to nextStage.
       stageReached[homeIdx] = furthestStage(stageReached[homeIdx], reachedStage);
       stageReached[awayIdx] = furthestStage(stageReached[awayIdx], reachedStage);
       stageReached[r.winnerIdx] = furthestStage(stageReached[r.winnerIdx], nextStage);
+      onFixture?.(fixtureStage, String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
     }
   };
 
-  runRound(BRACKET.r32, 'r32', 'r16');
-  runRound(BRACKET.r16, 'r16', 'qf');
-  runRound(BRACKET.qf, 'qf', 'sf');
-  runRound(BRACKET.sf, 'sf', 'final');
+  runRound(BRACKET.r32, 'r32', 'r16',  'r32');
+  runRound(BRACKET.r16, 'r16', 'qf',   'r16');
+  runRound(BRACKET.qf,  'qf',  'sf',   'qf');
+  runRound(BRACKET.sf,  'sf',  'final','sf');
 
   // 3rd place playoff (losers of SF). Both teams stay at stageReached='sf' —
   // winning bronze doesn't bump the stage. Bronze is tracked via thirdPlace below.
@@ -175,6 +199,7 @@ export function simulateTournament(
     matchLoser.set(m.id, r.loserIdx);
     goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
     goalsFor[awayIdx] += r.ga; goalsAgainst[awayIdx] += r.gh;
+    onFixture?.('3rd', String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
   }
   const thirdPlace = matchWinner.get(BRACKET.third_place.id)!;
   const fourthPlace = matchLoser.get(BRACKET.third_place.id)!;
@@ -190,11 +215,12 @@ export function simulateTournament(
     goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
     goalsFor[awayIdx] += r.ga; goalsAgainst[awayIdx] += r.gh;
     stageReached[r.winnerIdx] = 'champion';
+    onFixture?.('final', String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
   }
   const champion = matchWinner.get(BRACKET.final.id)!;
   const runnerUp = matchLoser.get(BRACKET.final.id)!;
 
-  return { champion, runnerUp, thirdPlace, fourthPlace, stageReached, goalsFor, goalsAgainst };
+  return { champion, runnerUp, thirdPlace, fourthPlace, stageReached, groupFinish, goalsFor, goalsAgainst };
 }
 
 const STAGE_ORDER: Stage[] = ['group', 'r32', 'r16', 'qf', 'sf', 'final', 'champion'];

@@ -24,6 +24,9 @@ export interface MatchResult {
  */
 export type Stage = 'group' | 'r32' | 'r16' | 'qf' | 'sf' | 'final' | 'champion';
 
+/** Per-team group-stage finish position. */
+export type GroupFinish = 'first' | 'second' | 'thirdAdvances' | 'thirdOut' | 'fourth';
+
 export interface TournamentResult {
   /** champion = team index that won the final */
   champion: number;
@@ -35,10 +38,50 @@ export interface TournamentResult {
   fourthPlace: number;
   /** for each team idx: the furthest stage they reached */
   stageReached: Stage[];
+  /** for each team idx: their final position in the group stage */
+  groupFinish: GroupFinish[];
   /** total goals scored by each team across the tournament (regular time only) */
   goalsFor: Int32Array;
   /** total goals conceded by each team */
   goalsAgainst: Int32Array;
+}
+
+/**
+ * Per-fixture aggregate accumulated over N simulations.
+ *
+ * For group matches, the slot is fixed (always the same home/away pair), so
+ * there's one entry per slot. For knockout matches, the same slot can host
+ * different matchups across sims (depending on who advances), so we key by
+ * `${slotId}|${homeId}-${awayId}` and count separately for each variant.
+ *
+ * `count` of a knockout entry divided by N is the probability of that
+ * specific matchup occurring at that slot. Sum of counts across all
+ * matchups for a single slot equals N (every sim plays that slot once,
+ * unless deeper bracket dependencies — irrelevant here).
+ */
+export interface MatchAggregate {
+  slotId: string;
+  /** Stage where this match happens: 'group' or 'r32'/'r16'/'qf'/'sf'/'final'/'3rd'. */
+  stage: 'group' | 'r32' | 'r16' | 'qf' | 'sf' | 'final' | '3rd';
+  /** Group letter for group-stage fixtures, undefined otherwise. */
+  group?: string;
+  /** Home team ID (fixed for group fixtures, varies per sim for knockout). */
+  home: string;
+  /** Away team ID. */
+  away: string;
+  count: number;
+  winsHome: number;
+  draws: number;
+  winsAway: number;
+  sumGoalsHome: number;
+  sumGoalsAway: number;
+  /** 8×8 score histogram, index = goalsHome*8 + goalsAway. */
+  scoreHist: Int32Array;
+}
+
+/** Serialization-friendly version of MatchAggregate (Int32Array → number[]). */
+export interface MatchAggregateSerialized extends Omit<MatchAggregate, 'scoreHist'> {
+  scoreHist: number[];
 }
 
 export interface AggregateResult {
@@ -67,4 +110,15 @@ export interface AggregateResult {
   };
   /** histogram of total goals scored across the tournament (regular time, group + knockout) */
   tournamentGoalsHistogram: Int32Array;
+  /**
+   * Per-fixture aggregates. Keys are slotId for group stage ("A:0", "A:1", ...
+   * "L:5"); for knockout, key is "{slotId}|{home}-{away}" so different matchups
+   * at the same slot are tracked independently.
+   */
+  fixtures: Map<string, MatchAggregate>;
+  /**
+   * Scorer accumulator. Key = "TEAMID|PlayerName" (e.g. "ARG|Lionel Messi").
+   * Value = total goals across all sims for that player.
+   */
+  scorers: Map<string, number>;
 }

@@ -24,6 +24,20 @@ export function GoalStats({ result }: Props) {
       .slice(0, 10);
   }, [result]);
 
+  const teamById = useMemo(() => new Map(result.teams.map((t) => [t.id, t])), [result]);
+
+  const topPlayers = useMemo(() => {
+    return result.scorers
+      .filter(([k]) => !k.endsWith('|Otros'))
+      .map(([key, total]) => {
+        const [teamId, name] = key.split('|');
+        return { teamId, name, goals: total / result.numSimulations, team: teamById.get(teamId) };
+      })
+      .filter((x) => x.team)
+      .sort((a, b) => b.goals - a.goals)
+      .slice(0, 10);
+  }, [result, teamById]);
+
   const totalGoalsStats = useMemo(() => {
     const h = result.tournamentGoalsHistogram;
     let n = 0, sum = 0;
@@ -154,6 +168,26 @@ export function GoalStats({ result }: Props) {
             ))}
           </ol>
           <p className="mt-4 text-[10px] text-fg-3 font-mono">{t('avg_per_tournament')}</p>
+        </div>
+
+        <div className="rounded-2xl border border-border glass p-6 lg:col-span-2">
+          <h3 className="text-xs uppercase tracking-[0.18em] text-fg-3 font-mono mb-4">
+            Top 10 goleadores individuales <span className="text-fg-3 normal-case">· aproximación goal-share</span>
+          </h3>
+          <ol className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {topPlayers.map((p, i) => (
+              <li key={`${p.teamId}|${p.name}`} className="flex items-center gap-3 rounded-lg border border-border bg-bg-2/30 px-3 py-2">
+                <span className="w-5 text-right font-mono text-[10px] text-fg-3 tabular">{i + 1}</span>
+                {p.team && <Flag code={p.team.flag} size={20} />}
+                <span className="flex-1 truncate text-sm text-fg-1">{p.name}</span>
+                <span className="font-mono text-xs tabular text-fg-0">{p.goals.toFixed(2)}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3 text-[10px] text-fg-3">
+            Distribución multinomial sobre los goles de cada equipo. No modela lesiones, forma o suplencias —
+            ver <a className="underline decoration-gold/40 underline-offset-2" href="/methodology">metodología</a>.
+          </p>
         </div>
       </div>
     </section>

@@ -1,8 +1,11 @@
-import type { Team, AggregateResult } from './types';
+import type { Team, AggregateResult, MatchAggregate } from './types';
 import { XoshiroRNG } from './rng';
 import { simulateTournament } from './tournament';
+import { distributeGoals } from './scorers';
 
 import teamsData from '@/data/teams.json';
+
+const SCORE_HIST_SIZE = 64; // 8×8 grid (goalsHome 0..7 × goalsAway 0..7)
 
 export const TEAMS: Team[] = (teamsData as { teams: Team[] }).teams;
 const TEAM_IDX = new Map(TEAMS.map((t, i) => [t.id, i] as const));
@@ -46,12 +49,51 @@ export function runSimulations(opts: RunOptions): AggregateResult {
       fourth:         new Int32Array(T),
     },
     tournamentGoalsHistogram: new Int32Array(MAX_TOURNAMENT_GOALS),
+    fixtures: new Map(),
+    scorers: new Map(),
+  };
+
+  // Helper to upsert a fixture aggregate + distribute goals to scorers.
+  const upsertFixture = (
+    stage: 'group' | 'r32' | 'r16' | 'qf' | 'sf' | 'final' | '3rd',
+    slotId: string,
+    group: string | undefined,
+    homeIdx: number,
+    awayIdx: number,
+    gh: number,
+    ga: number,
+  ) => {
+    const homeId = teams[homeIdx].id;
+    const awayId = teams[awayIdx].id;
+    const key = stage === 'group' ? slotId : `${slotId}|${homeId}-${awayId}`;
+    let f = result.fixtures.get(key);
+    if (!f) {
+      f = {
+        slotId, stage, group, home: homeId, away: awayId,
+        count: 0, winsHome: 0, draws: 0, winsAway: 0,
+        sumGoalsHome: 0, sumGoalsAway: 0,
+        scoreHist: new Int32Array(SCORE_HIST_SIZE),
+      } satisfies MatchAggregate;
+      result.fixtures.set(key, f);
+    }
+    f.count++;
+    f.sumGoalsHome += gh;
+    f.sumGoalsAway += ga;
+    if (gh > ga) f.winsHome++;
+    else if (gh < ga) f.winsAway++;
+    else f.draws++;
+    const h = Math.min(gh, 7);
+    const a = Math.min(ga, 7);
+    f.scoreHist[h * 8 + a]++;
+    // Per-player goal distribution (multinomial draw per goal).
+    distributeGoals(homeId, gh, rng, result.scorers);
+    distributeGoals(awayId, ga, rng, result.scorers);
   };
 
   const progressEvery = opts.progressEvery ?? Math.max(500, Math.floor(N / 100));
 
   for (let sim = 0; sim < N; sim++) {
-    const t = simulateTournament(teams, TEAM_IDX, rng);
+    const t = simulateTournament(teams, TEAM_IDX, rng, upsertFixture);
 
     // accumulate stage counts: any team that reached stage X also reached all stages ≤ X.
     for (let i = 0; i < T; i++) {
@@ -72,6 +114,11 @@ export function runSimulations(opts: RunOptions): AggregateResult {
 
     // 3rd-place finisher (winner of the 3rd-place playoff)
     result.stageCounts.third[t.thirdPlace]++;
+
+    // group-stage finish breakdown
+    for (let i = 0; i < T; i++) {
+      result.groupFinish[t.groupFinish[i]][i]++;
+    }
 
     // goal totals
     let tournamentGoals = 0;

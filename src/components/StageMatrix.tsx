@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Flag } from './Flag';
 import { cn, formatPct } from '@/lib/utils';
+import { useSelection } from '@/hooks/useSelection';
 import type { SerializedResult } from '@/lib/sim/worker';
 
 interface Props { result: SerializedResult; }
@@ -35,6 +36,7 @@ type FilterKey = 'all' | 'top16' | 'southam' | 'europe' | 'hosts' | 'underdogs';
 export function StageMatrix({ result }: Props) {
   const t = useTranslations('stages');
   const locale = useLocale();
+  const openTeam = useSelection((s) => s.openTeam);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [hoverRow, setHoverRow] = useState<number | null>(null);
   const [hoverCol, setHoverCol] = useState<string | null>(null);
@@ -129,9 +131,10 @@ export function StageMatrix({ result }: Props) {
               <tr
                 key={row.team.id}
                 className={cn(
-                  'border-t border-border/50 transition-colors',
+                  'cursor-pointer border-t border-border/50 transition-colors',
                   hoverRow === row.idx && 'bg-bg-2/40',
                 )}
+                onClick={() => openTeam(row.team.id)}
                 onMouseEnter={() => setHoverRow(row.idx)}
                 onMouseLeave={() => setHoverRow(null)}
               >

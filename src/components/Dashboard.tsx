@@ -10,6 +10,11 @@ import { GroupCards } from './GroupCards';
 import { BracketTree } from './BracketTree';
 import { GoalStats } from './GoalStats';
 import { SurpriseCards } from './SurpriseCards';
+import { MatchCalendar } from './MatchCalendar';
+import { TournamentStats } from './TournamentStats';
+import { MarketEdge } from './MarketEdge';
+import { TeamDetailDrawer } from './TeamDetailDrawer';
+import { MatchDetailDrawer } from './MatchDetailDrawer';
 
 export function Dashboard() {
   const { state, run } = useSimulation();
@@ -35,8 +40,13 @@ export function Dashboard() {
           <StageMatrix result={state.result} />
           <GroupCards result={state.result} />
           <BracketTree result={state.result} />
+          <MatchCalendar result={state.result} />
+          <TournamentStats result={state.result} />
+          <MarketEdge result={state.result} />
           <GoalStats result={state.result} />
           <SurpriseCards result={state.result} />
+          <TeamDetailDrawer result={state.result} />
+          <MatchDetailDrawer result={state.result} />
         </>
       )}
     </div>

@@ -61,10 +61,9 @@ export function SimulationControls({ state, onRun }: Props) {
         onClick={() => onRun(selected)}
         disabled={isRunning}
         className={cn(
-          'group relative h-16 w-full max-w-md overflow-hidden rounded-2xl text-base font-medium tracking-wide transition-all',
+          'group relative h-16 w-full max-w-md overflow-hidden rounded-2xl text-base font-medium tracking-wide transition-transform',
           'border border-gold/40',
           'bg-gradient-to-b from-gold to-gold-lo text-bg-0',
-          'shadow-[0_20px_60px_-12px_oklch(0.80_0.18_75/0.55),inset_0_1px_0_oklch(1_0_0/0.4)]',
           'motion-safe:animate-[glow-pulse_3.5s_ease-in-out_infinite]',
           'hover:scale-[1.02] active:scale-[0.99]',
           isRunning && 'cursor-default hover:scale-100',
