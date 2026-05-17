@@ -95,25 +95,14 @@ body::before {
   100% { background-position: 200% 0; }
 }
 /*
- * Soft, layered glow for the primary CTA. Three stacked shadows at increasing
- * blur radii so the falloff is fully gradual — no visible "rectangle" edge.
- * The inner inset highlight stays constant; only the outer halo pulses.
+ * The CTA's ambient glow is rendered as a separate radial-gradient div
+ * (see SimulationControls.tsx) so the falloff is elliptical, not the
+ * rectangular outline a box-shadow would always produce. Here we only
+ * pulse its opacity, never its shape.
  */
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow:
-      0 1px 0 0 oklch(1 0 0 / 0.40) inset,
-      0 8px 24px -6px oklch(0.80 0.18 75 / 0.40),
-      0 24px 64px -16px oklch(0.80 0.18 75 / 0.30),
-      0 56px 140px -40px oklch(0.80 0.18 75 / 0.22);
-  }
-  50% {
-    box-shadow:
-      0 1px 0 0 oklch(1 0 0 / 0.40) inset,
-      0 10px 32px -4px oklch(0.80 0.18 75 / 0.50),
-      0 28px 80px -12px oklch(0.80 0.18 75 / 0.38),
-      0 64px 160px -32px oklch(0.80 0.18 75 / 0.28);
-  }
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.70; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1.00; transform: translate(-50%, -50%) scale(1.04); }
 }
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

@@ -57,14 +57,31 @@ export function SimulationControls({ state, onRun }: Props) {
         })}
       </div>
 
+      <div className="relative w-full max-w-md">
+        {/* Ambient halo — a separate radial-gradient layer so the falloff is
+            elliptical (Gaussian-like), not a rectangle outline like box-shadow
+            would produce no matter how blurred. Pulses opacity, not shape. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 motion-safe:animate-[halo-pulse_4s_ease-in-out_infinite]"
+          style={{
+            width: '180%',
+            height: '420%',
+            transform: 'translate(-50%, -50%)',
+            background:
+              'radial-gradient(ellipse 50% 35% at 50% 50%, oklch(0.80 0.18 75 / 0.55), oklch(0.80 0.18 75 / 0.15) 35%, transparent 65%)',
+            filter: 'blur(28px)',
+          }}
+        />
+
       <button
         onClick={() => onRun(selected)}
         disabled={isRunning}
         className={cn(
-          'group relative h-16 w-full max-w-md overflow-hidden rounded-2xl text-base font-medium tracking-wide transition-transform',
+          'group relative h-16 w-full overflow-hidden rounded-2xl text-base font-medium tracking-wide transition-transform',
           'border border-gold/40',
           'bg-gradient-to-b from-gold to-gold-lo text-bg-0',
-          'motion-safe:animate-[glow-pulse_3.5s_ease-in-out_infinite]',
+          'shadow-[0_1px_0_0_oklch(1_0_0/0.35)_inset]',
           'hover:scale-[1.02] active:scale-[0.99]',
           isRunning && 'cursor-default hover:scale-100',
         )}
@@ -125,6 +142,7 @@ export function SimulationControls({ state, onRun }: Props) {
           )}
         </span>
       </button>
+      </div>
     </div>
   );
 }
