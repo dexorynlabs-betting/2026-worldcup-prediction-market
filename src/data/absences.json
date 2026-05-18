@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-05-18T12:25:20.180Z",
+    "current_updated_at": "2026-05-18T18:28:39.373Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -248,15 +248,7 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "CPV": [
-      {
-        "player": "Bruno Varela",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 2,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "CPV": [],
     "CRO": [],
     "CUW": [
       {
@@ -353,6 +345,13 @@
       }
     ],
     "ESP": [
+      {
+        "player": "Fermín López",
+        "position": "AM",
+        "minutes_qual": 0,
+        "market_value_mil": 100,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
       {
         "player": "Lamine Yamal",
         "position": "WG",
@@ -600,22 +599,7 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "TUR": [
-      {
-        "player": "Ahmetcan Kaplan",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Mustafa Eskihellaç",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 3.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "TUR": [],
     "URU": [
       {
         "player": "Sebastián Cáceres",
