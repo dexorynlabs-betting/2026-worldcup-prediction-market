@@ -2,7 +2,7 @@
 
 import { runSimulations } from './engine';
 import { setEngineAbsencesEnabled } from './absences';
-import type { AggregateResult, MatchAggregateSerialized } from './types';
+import type { AggregateResult, MatchAggregateSerialized, SampleSim } from './types';
 
 export type WorkerInbound =
   | { type: 'run'; numSimulations: number; seed?: number };
@@ -52,6 +52,8 @@ export interface SerializedResult {
   fixtures: Array<[string, MatchAggregateSerialized]>;
   /** Each [key, totalGoals] entry from the scorers Map. */
   scorers: Array<[string, number]>;
+  /** Captured sample of full simulations for the "browse simulations" UI. */
+  sampleSims: SampleSim[];
 }
 
 function serialize(agg: AggregateResult): SerializedResult {
@@ -84,6 +86,7 @@ function serialize(agg: AggregateResult): SerializedResult {
     tournamentGoalsHistogram: ta(agg.tournamentGoalsHistogram),
     fixtures,
     scorers: Array.from(agg.scorers.entries()),
+    sampleSims: agg.sampleSims,
   };
 }
 

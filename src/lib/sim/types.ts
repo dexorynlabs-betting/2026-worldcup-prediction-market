@@ -91,6 +91,31 @@ export interface MatchAggregateSerialized extends Omit<MatchAggregate, 'scoreHis
   scoreHist: number[];
 }
 
+/**
+ * One captured-in-full simulation. The engine samples ~1 every (N / SAMPLE_SIZE)
+ * sims and stores the complete match list so the UI can let users browse
+ * actual tournaments — not just aggregates. Memory cost is ~2KB per sample.
+ */
+export interface SampleSim {
+  /** Index of this sim within the full run (0..N-1). */
+  simIdx: number;
+  matches: Array<{
+    /** 'group' | 'r32' | 'r16' | 'qf' | 'sf' | '3rd' | 'final' */
+    stage: 'group' | 'r32' | 'r16' | 'qf' | 'sf' | '3rd' | 'final';
+    /** For groups: 'A:0'..'L:5'. For KO: match.id as string. */
+    slotId: string;
+    /** Team indices in the global teams array. */
+    home: number;
+    away: number;
+    gh: number;
+    ga: number;
+  }>;
+  champion: number;       // team idx
+  runnerUp: number;
+  thirdPlace: number;
+  fourthPlace: number;
+}
+
 export interface AggregateResult {
   numSimulations: number;
   teams: Team[];
@@ -128,4 +153,10 @@ export interface AggregateResult {
    * Value = total goals across all sims for that player.
    */
   scorers: Map<string, number>;
+  /**
+   * Captured sample of complete simulations (every Math.floor(N/SAMPLE_SIZE)-th
+   * sim). Lets the UI show real tournaments instead of just aggregates. Cost
+   * is ~2KB per sample → ~600KB for N=100k at SAMPLE_SIZE=300.
+   */
+  sampleSims: SampleSim[];
 }

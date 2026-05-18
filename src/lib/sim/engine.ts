@@ -1,4 +1,4 @@
-import type { Team, AggregateResult, MatchAggregate } from './types';
+import type { Team, AggregateResult, MatchAggregate, SampleSim } from './types';
 import { XoshiroRNG } from './rng';
 import { simulateTournament } from './tournament';
 import { distributeGoals } from './scorers';
@@ -6,6 +6,8 @@ import { distributeGoals } from './scorers';
 import teamsData from '@/data/teams.json';
 
 const SCORE_HIST_SIZE = 64; // 8×8 grid (goalsHome 0..7 × goalsAway 0..7)
+/** Number of full simulations to retain verbatim for the "browse simulations" UI. */
+const SAMPLE_SIM_TARGET = 300;
 
 export const TEAMS: Team[] = (teamsData as { teams: Team[] }).teams;
 const TEAM_IDX = new Map(TEAMS.map((t, i) => [t.id, i] as const));
@@ -51,7 +53,15 @@ export function runSimulations(opts: RunOptions): AggregateResult {
     tournamentGoalsHistogram: new Int32Array(MAX_TOURNAMENT_GOALS),
     fixtures: new Map(),
     scorers: new Map(),
+    sampleSims: [],
   };
+
+  // Snapshot every k-th sim into result.sampleSims. For N < SAMPLE_SIM_TARGET we
+  // capture every sim; for larger N we space them out evenly.
+  const sampleEvery = Math.max(1, Math.floor(N / SAMPLE_SIM_TARGET));
+  // currentSampleMatches lives across the call to simulateTournament — we
+  // populate it via the upsertFixture wrapper below.
+  let currentSampleMatches: SampleSim['matches'] | null = null;
 
   // Helper to upsert a fixture aggregate + distribute goals to scorers.
   const upsertFixture = (
@@ -88,12 +98,32 @@ export function runSimulations(opts: RunOptions): AggregateResult {
     // Per-player goal distribution (multinomial draw per goal).
     distributeGoals(homeId, gh, rng, result.scorers);
     distributeGoals(awayId, ga, rng, result.scorers);
+
+    // If this sim is on the sample track, retain the match.
+    if (currentSampleMatches) {
+      currentSampleMatches.push({ stage, slotId, home: homeIdx, away: awayIdx, gh, ga });
+    }
   };
 
   const progressEvery = opts.progressEvery ?? Math.max(500, Math.floor(N / 100));
 
   for (let sim = 0; sim < N; sim++) {
+    const onSampleTrack = sim % sampleEvery === 0 && result.sampleSims.length < SAMPLE_SIM_TARGET;
+    currentSampleMatches = onSampleTrack ? [] : null;
+
     const t = simulateTournament(teams, TEAM_IDX, rng, upsertFixture);
+
+    if (onSampleTrack && currentSampleMatches) {
+      result.sampleSims.push({
+        simIdx: sim,
+        matches: currentSampleMatches,
+        champion: t.champion,
+        runnerUp: t.runnerUp,
+        thirdPlace: t.thirdPlace,
+        fourthPlace: t.fourthPlace,
+      });
+    }
+    currentSampleMatches = null;
 
     // accumulate stage counts: any team that reached stage X also reached all stages ≤ X.
     for (let i = 0; i < T; i++) {
