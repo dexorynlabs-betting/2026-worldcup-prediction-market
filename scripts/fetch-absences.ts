@@ -70,6 +70,7 @@ const COMMON_HEADERS: Record<string, string> = {
 };
 
 const ABSENCES_PATH = path.resolve(__dirname, '..', 'src', 'data', 'absences.json');
+const SQUADS_PATH = path.resolve(__dirname, '..', 'src', 'data', 'squads.json');
 
 // ---------- helpers ----------
 
@@ -238,6 +239,52 @@ function injuredToAbsences(squad: SquadResult): AbsenceEntry[] {
     }));
 }
 
+/** Persist the full scraped squads (every player, not just injured) so the
+ *  scenario panel in the UI can let users toggle hypothetical absences for
+ *  any squad member. Keeps the same schema across teams so the file is
+ *  trivially diffable. */
+interface SquadsFile {
+  _meta: Record<string, unknown>;
+  squads: Record<string, Array<{
+    player: string;
+    position: Position;
+    market_value_mil: number | null;
+    injured?: boolean;
+  }>>;
+}
+
+function loadSquadsFile(): SquadsFile {
+  if (!fs.existsSync(SQUADS_PATH)) {
+    return {
+      _meta: {
+        purpose: 'Full national-team squads scraped from transfermarkt. Powers the "what if X gets injured" scenario panel. Refreshed by the daily fetch-absences cron alongside absences.json.',
+        updated_at: null,
+        source: 'transfermarkt squad pages',
+      },
+      squads: {},
+    };
+  }
+  return JSON.parse(fs.readFileSync(SQUADS_PATH, 'utf8')) as SquadsFile;
+}
+
+function saveSquadsFile(file: SquadsFile): void {
+  fs.writeFileSync(SQUADS_PATH, JSON.stringify(file, null, 2) + '\n', 'utf8');
+}
+
+function mergeIntoSquads(scraped: SquadResult[]): void {
+  const file = loadSquadsFile();
+  for (const sq of scraped) {
+    file.squads[sq.team_id] = sq.players.map((p) => ({
+      player: p.name,
+      position: p.position,
+      market_value_mil: p.market_value_mil,
+      ...(p.injured ? { injured: true } : {}),
+    }));
+  }
+  file._meta = { ...file._meta, updated_at: new Date().toISOString() };
+  saveSquadsFile(file);
+}
+
 /** Update absences.json `current` for the listed team IDs. Other teams' current entries are preserved. */
 function mergeIntoAbsences(squads: SquadResult[]): {
   totalAbsences: number;
@@ -309,10 +356,12 @@ async function main() {
   if (flagAll) {
     const squads = await fetchAll();
     const summary = mergeIntoAbsences(squads);
+    mergeIntoSquads(squads);
     console.error(
       `[main] WROTE absences.json: teams_with_injuries=${summary.teamsWithAbsences} ` +
         `total_injured_players=${summary.totalAbsences}`,
     );
+    console.error(`[main] WROTE squads.json: teams=${squads.length}`);
     return;
   }
 
@@ -325,6 +374,7 @@ async function main() {
 
   if (flagWrite) {
     const summary = mergeIntoAbsences([squad]);
+    mergeIntoSquads([squad]);
     console.error(
       `[main] WROTE absences.json for ${teamId}: injured=${summary.totalAbsences}`,
     );

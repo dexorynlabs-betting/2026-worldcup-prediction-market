@@ -9,6 +9,9 @@ import { Flag } from './Flag';
 import { cn, formatPct, wilsonCI, formatCIBand } from '@/lib/utils';
 import { getScorers } from '@/lib/sim/scorers';
 import { TeamAbsencesPanel, AbsenceBadge } from './TeamAbsencesPanel';
+import { ScenarioPanel } from './ScenarioPanel';
+import { SimsExplorer } from './SimsExplorer';
+import { currentAbsences } from '@/lib/sim/absences';
 import type { SerializedResult } from '@/lib/sim/worker';
 
 interface Props {
@@ -163,6 +166,9 @@ export function TeamDetailDrawer({ result, resultNoAbsences }: Props) {
                   />
                 </section>
 
+                {/* Browse individual simulations */}
+                <SimsExplorer teamIdx={teamIdx} result={result} />
+
                 {/* Stage probabilities */}
                 <section>
                   <div className="mb-3 flex items-baseline justify-between">
@@ -203,6 +209,16 @@ export function TeamDetailDrawer({ result, resultNoAbsences }: Props) {
 
                 {/* Current absences (injuries / suspensions) */}
                 <TeamAbsencesPanel teamId={team.id} />
+
+                {/* Scenario panel: hypothetical absences */}
+                {data.noAbs && (
+                  <ScenarioPanel
+                    teamId={team.id}
+                    championProbCurrent={data.wasChamp}
+                    championProbNoAbsences={data.noAbs.wasChamp}
+                    currentAbsences={currentAbsences(team.id)}
+                  />
+                )}
 
                 {/* Counterfactual: what if every flagged injury were fake/precautionary */}
                 {data.noAbs && (
