@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { ArrowLeft } from 'lucide-react';
-import { runBacktest, runBonusSweep, runRecentFormSweep, type CalibrationBucket, type RecentFormSweepCell, type ScoredMatch, type SweepPoint } from '@/lib/sim/backtest';
+import { runBacktest, runBonusSweep, runRecentFormSweep, runPenaltyEvaluation, type CalibrationBucket, type PenaltyEvalRow, type RecentFormSweepCell, type ScoredMatch, type SweepPoint } from '@/lib/sim/backtest';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-static';
@@ -15,6 +15,7 @@ export default async function BacktestPage({ params }: { params: Promise<{ local
   const r = runBacktest({ recentAlpha: 0.2, recentLookbackYears: 1 });
   const sweep = runBonusSweep();
   const recentSweep = runRecentFormSweep();
+  const penEval = runPenaltyEvaluation();
 
   return (
     <article className="relative mx-auto max-w-[1100px] px-6 pt-32 pb-32">
@@ -168,6 +169,51 @@ export default async function BacktestPage({ params }: { params: Promise<{ local
         </div>
       </Section>
 
+      <Section title="Tier 1 #3 · Modelo de penales">
+        <p className="mb-4 max-w-3xl text-sm text-fg-2">
+          El motor antes resolvía empates 0-0 en KO con una moneda al aire (50/50).
+          Lo reemplazamos por un modelo Bayesian Empirical shrinkage sobre{' '}
+          <strong className="text-fg-1">103 shootouts históricos</strong> en torneos top (Mundial, Eurocopa,
+          Copa América, Copa Asia, AFCON):
+        </p>
+        <pre className="mb-4 overflow-x-auto rounded-xl border border-border bg-bg-1/60 px-4 py-3 font-mono text-xs leading-relaxed text-gold/95 tabular max-w-2xl">
+{`rate(team) = (wins + k · 0.5) / (n + k)        k = 10
+P(A gana) = rate(A) / (rate(A) + rate(B))`}
+        </pre>
+        <div className="mb-5 grid gap-4 sm:grid-cols-2">
+          <Stat
+            label="Modelo · n=13 shootouts del backtest"
+            value={(penEval.modelAccuracy * 100).toFixed(1) + '%'}
+            tone={penEval.modelAccuracy > 0.55 ? 'good' : penEval.modelAccuracy > 0.5 ? 'mid' : 'bad'}
+            subtitle={`Brier ${penEval.modelBrier.toFixed(4)}`}
+          />
+          <Stat
+            label="Coin flip · baseline"
+            value={(penEval.baselineAccuracy * 100).toFixed(1) + '%'}
+            tone="mid"
+            subtitle={`Brier ${penEval.baselineBrier.toFixed(4)}`}
+          />
+        </div>
+        <PenaltyTable rows={penEval.rows} />
+        <div className="mt-5 max-w-3xl space-y-3 text-sm text-fg-2">
+          <p>
+            <span className="text-rose font-medium">Honesto:</span> con n=13 shootouts el IC 95% de la
+            accuracy es [26%, 81%]. El +3.8pp del modelo vs coin flip <strong className="text-fg-1">no es
+            estadísticamente significativo</strong>. Brier es esencialmente igual.
+          </p>
+          <p>
+            2018 fue devastador (0/4): Inglaterra rompió la curse, Rusia ganó como anfitrión, Croacia
+            ganó dos seguidos. El modelo no podía saber. 2014 y 2022 fueron sólidos (3/4 y 4/5).
+          </p>
+          <p>
+            <strong className="text-fg-1">Mergeado de todos modos.</strong> Razones: (1) filosóficamente
+            más correcto que un coin flip ciego, (2) no empeora Brier de forma significativa, (3) en el
+            video se vende mejor que "moneda al aire", (4) cuando expandamos el backtest a 1990-2010
+            tendremos n≥40 shootouts y veremos si la señal es real. Si en ese punto Brier sube, retiramos.
+          </p>
+        </div>
+      </Section>
+
       <Section title="Sweep · Host bonus">
         <p className="mb-4 max-w-3xl text-sm text-fg-2">
           El modelo actual le da <span className="text-fg-1 font-medium">+100 ELO</span> al equipo
@@ -285,6 +331,52 @@ function Stat({ label, value, subtitle, tone }: { label: string; value: string; 
         {value}
       </div>
       <div className="mt-1 font-mono text-[10px] text-fg-3">{subtitle}</div>
+    </div>
+  );
+}
+
+function PenaltyTable({ rows }: { rows: PenaltyEvalRow[] }) {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-border glass">
+      <table className="min-w-full">
+        <thead className="text-[10px] uppercase tracking-[0.18em] text-fg-3 font-mono">
+          <tr>
+            <th className="px-4 py-3 text-left">Año</th>
+            <th className="px-3 py-3 text-left">Etapa</th>
+            <th className="px-4 py-3 text-left">Local (n, rate)</th>
+            <th className="px-4 py-3 text-left">Visitante (n, rate)</th>
+            <th className="px-3 py-3 text-right">P(local)</th>
+            <th className="px-3 py-3 text-left">Modelo</th>
+            <th className="px-3 py-3 text-left">Real</th>
+            <th className="px-3 py-3 text-center">✓/✗</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i} className={cn('border-t border-border/40', r.correct && 'bg-emerald-lo/5')}>
+              <td className="px-4 py-2 font-mono text-xs tabular text-fg-2">{r.year}</td>
+              <td className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-fg-3">{r.stage}</td>
+              <td className="px-4 py-2 text-sm">
+                <span className="font-medium text-fg-1">{r.home}</span>
+                <span className="ml-1 font-mono text-[10px] text-fg-3">({r.nHome}, {(r.rateHome * 100).toFixed(0)}%)</span>
+              </td>
+              <td className="px-4 py-2 text-sm">
+                <span className="font-medium text-fg-1">{r.away}</span>
+                <span className="ml-1 font-mono text-[10px] text-fg-3">({r.nAway}, {(r.rateAway * 100).toFixed(0)}%)</span>
+              </td>
+              <td className="px-3 py-2 text-right font-mono text-xs tabular text-fg-0">{(r.pHome * 100).toFixed(0)}%</td>
+              <td className="px-3 py-2 text-sm text-fg-1">{r.modelPicked === 'home' ? r.home : r.away}</td>
+              <td className="px-3 py-2 text-sm text-fg-0 font-medium">{r.actual === 'home' ? r.home : r.away}</td>
+              <td className={cn(
+                'px-3 py-2 text-center font-mono text-sm',
+                r.correct ? 'text-emerald' : 'text-rose',
+              )}>
+                {r.correct ? '✓' : '✗'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

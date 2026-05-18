@@ -1,5 +1,6 @@
 import type { Team } from './types';
 import { sampleScore } from './match';
+import { shootoutWinProb } from './penalties';
 import type { XoshiroRNG } from './rng';
 
 export interface KnockoutMatch {
@@ -12,7 +13,14 @@ export interface KnockoutMatch {
   drawn: boolean;     // true if penalties decided it
 }
 
-/** Simulate a single knockout match. Coin flip on regulation-time draws (penalties). */
+/**
+ * Simulate a single knockout match.
+ *
+ * On a 0-0 regulation draw, the winner is decided by a shoot-out: we sample
+ * Bernoulli with probability `shootoutWinProb(homeId, awayId)` from the
+ * Empirical Bayes shrinkage model (see penalties.ts). Teams with no
+ * shoot-out history default to 50/50.
+ */
 export function simulateKnockout(
   homeIdx: number,
   awayIdx: number,
@@ -29,7 +37,8 @@ export function simulateKnockout(
     winnerIdx = awayIdx; loserIdx = homeIdx;
   } else {
     drawn = true;
-    if (rng.next() < 0.5) {
+    const pHome = shootoutWinProb(teams[homeIdx].id, teams[awayIdx].id);
+    if (rng.next() < pHome) {
       winnerIdx = homeIdx; loserIdx = awayIdx;
     } else {
       winnerIdx = awayIdx; loserIdx = homeIdx;

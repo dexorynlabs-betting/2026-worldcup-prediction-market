@@ -27,6 +27,7 @@
 
 import { lambdaFor } from './goals';
 import { HOST_BONUS } from './elo';
+import { shootoutWinProb, shootoutRate, shootoutSampleSize } from './penalties';
 import backtestData from '@/data/backtest.json';
 
 const MAX_GOALS = 8;  // P(>8 goals at λ=3) ≈ 0.001 — negligible
@@ -40,6 +41,8 @@ interface RawMatch {
   away: string;
   gh: number;
   ga: number;
+  /** 'home', 'away', or null/undefined if the match wasn't decided on penalties. */
+  pen_winner?: 'home' | 'away' | null;
 }
 
 interface RawTournament {
@@ -359,6 +362,90 @@ export function runRecentFormSweep(
     }
   }
   return out;
+}
+
+/**
+ * Evaluate the penalty model against the actual shoot-outs in the backtest
+ * dataset. For each match where regulation ended in a draw and PKs were
+ * taken, we compute `shootoutWinProb(home, away, cutoffYear=tournamentYear)`
+ * (so the historical rates EXCLUDE the very shootouts we're predicting —
+ * no look-ahead) and compare against the actual penalty winner.
+ *
+ * Returns: per-match prediction + aggregate accuracy + Brier score vs 50/50
+ * baseline.
+ */
+export interface PenaltyEvalRow {
+  year: number;
+  stage: Stage;
+  home: string;
+  away: string;
+  rateHome: number;
+  rateAway: number;
+  nHome: number;
+  nAway: number;
+  pHome: number;
+  /** Actual penalty winner: 'home' or 'away'. */
+  actual: 'home' | 'away';
+  modelPicked: 'home' | 'away';
+  correct: boolean;
+  /** Brier score for the model's pHome vs the observed outcome (home=1, away=0). */
+  brier: number;
+  brierBaseline: number;
+}
+
+export interface PenaltyEvalSummary {
+  count: number;
+  modelAccuracy: number;
+  baselineAccuracy: number;  // always 0.5 for fair coin
+  modelBrier: number;
+  baselineBrier: number;     // always 0.25 for p=0.5
+  rows: PenaltyEvalRow[];
+}
+
+export function runPenaltyEvaluation(): PenaltyEvalSummary {
+  const file = backtestData as unknown as BacktestFile;
+  const rows: PenaltyEvalRow[] = [];
+  for (const t of file.tournaments) {
+    for (const m of t.matches) {
+      if (!m.pen_winner) continue;
+      const pHome = shootoutWinProb(m.home, m.away, t.year);  // cutoff = tournament year (excludes this shootout)
+      const modelPicked: 'home' | 'away' = pHome >= 0.5 ? 'home' : 'away';
+      const y = m.pen_winner === 'home' ? 1 : 0;
+      const brier = (pHome - y) ** 2;
+      const brierBaseline = (0.5 - y) ** 2;
+      rows.push({
+        year: t.year,
+        stage: m.stage,
+        home: m.home,
+        away: m.away,
+        rateHome: shootoutRate(m.home, t.year),
+        rateAway: shootoutRate(m.away, t.year),
+        nHome: shootoutSampleSize(m.home, t.year),
+        nAway: shootoutSampleSize(m.away, t.year),
+        pHome,
+        actual: m.pen_winner,
+        modelPicked,
+        correct: modelPicked === m.pen_winner,
+        brier,
+        brierBaseline,
+      });
+    }
+  }
+  const n = rows.length;
+  if (n === 0) {
+    return {
+      count: 0, modelAccuracy: 0, baselineAccuracy: 0.5,
+      modelBrier: 0, baselineBrier: 0.25, rows: [],
+    };
+  }
+  return {
+    count: n,
+    modelAccuracy: rows.filter((r) => r.correct).length / n,
+    baselineAccuracy: 0.5,
+    modelBrier: rows.reduce((s, r) => s + r.brier, 0) / n,
+    baselineBrier: 0.25,
+    rows,
+  };
 }
 
 export function runBonusSweep(values: number[] = [0, 50, 80, 100, 120, 150, 180, 220]): SweepPoint[] {

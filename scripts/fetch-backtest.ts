@@ -104,7 +104,12 @@ interface OpenfootballMatch {
   date: string;
   team1: string;
   team2: string;
-  score?: { ft?: [number, number]; ht?: [number, number] };
+  score?: {
+    ft?: [number, number];   // end of regulation (90 min)
+    ht?: [number, number];   // half-time
+    et?: [number, number];   // end of extra time
+    p?: [number, number];    // penalty shoot-out score (only present if PKs)
+  };
   round?: string;
   group?: string;
 }
@@ -137,6 +142,12 @@ interface BacktestMatch {
   away: string;        // ISO3 (`team2`)
   gh: number;          // regulation-time goals for home (score.ft[0])
   ga: number;          // regulation-time goals for away
+  /**
+   * Penalty shoot-out winner, or null if no shoot-out happened. When set, the
+   * match was tied in extra time and decided on penalties — this is what the
+   * penalty model is evaluated against.
+   */
+  pen_winner?: 'home' | 'away' | null;
 }
 
 interface BacktestTournament {
@@ -186,6 +197,10 @@ async function compileTournament(spec: TournamentSpec): Promise<BacktestTourname
     const awayId = NAME_TO_ID[m.team2];
     if (!homeId) { unmapped.add(m.team1); continue; }
     if (!awayId) { unmapped.add(m.team2); continue; }
+    let pen_winner: 'home' | 'away' | null = null;
+    if (m.score.p && m.score.p[0] !== m.score.p[1]) {
+      pen_winner = m.score.p[0] > m.score.p[1] ? 'home' : 'away';
+    }
     out.push({
       date: m.date,
       stage: classifyStage(m),
@@ -193,6 +208,7 @@ async function compileTournament(spec: TournamentSpec): Promise<BacktestTourname
       away: awayId,
       gh: m.score.ft[0],
       ga: m.score.ft[1],
+      pen_winner,
     });
     usedIds.add(homeId); usedIds.add(awayId);
   }
