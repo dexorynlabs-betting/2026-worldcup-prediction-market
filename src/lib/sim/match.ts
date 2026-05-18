@@ -67,6 +67,15 @@ export function hostBonus(team: Team, isKnockout: boolean): number {
   return team.is_host ? HOST_BONUS : 0;
 }
 
+/**
+ * Post-extra-time fatigue penalty (Tier 1 #5).
+ * A team that won its previous knockout match in extra time / penalties played
+ * ~30 min more than a rival who won in regulation. We multiply that team's λ
+ * by FATIGUE_LAMBDA_FACTOR in their next match. Magnitude conservative — feel
+ * free to recalibrate against backtest data once carryover is wired there.
+ */
+export const FATIGUE_LAMBDA_FACTOR = 0.92;
+
 /** Sample a regulation-time score (goals_a, goals_b) for a match between teams a and b. */
 export function sampleScore(
   a: Team,
@@ -74,13 +83,17 @@ export function sampleScore(
   rng: XoshiroRNG,
   isKnockout: boolean,
   stage: Stage = 'group',
+  fatigueA: boolean = false,
+  fatigueB: boolean = false,
 ): { ga: number; gb: number } {
   const eloA = effectiveElo(a, stage);
   const eloB = effectiveElo(b, stage);
   const bonusA = hostBonus(a, isKnockout);
   const bonusB = hostBonus(b, isKnockout);
-  const lambdaA = lambdaFor(eloA, eloB, bonusA);
-  const lambdaB = lambdaFor(eloB, eloA, bonusB);
+  let lambdaA = lambdaFor(eloA, eloB, bonusA);
+  let lambdaB = lambdaFor(eloB, eloA, bonusB);
+  if (fatigueA) lambdaA *= FATIGUE_LAMBDA_FACTOR;
+  if (fatigueB) lambdaB *= FATIGUE_LAMBDA_FACTOR;
   return {
     ga: samplePoisson(lambdaA, rng),
     gb: samplePoisson(lambdaB, rng),

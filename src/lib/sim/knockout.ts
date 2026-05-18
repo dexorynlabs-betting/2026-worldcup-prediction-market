@@ -28,8 +28,10 @@ export function simulateKnockout(
   teams: Team[],
   rng: XoshiroRNG,
   stage: AbsenceStage = 'r16',
+  fatigueHome: boolean = false,
+  fatigueAway: boolean = false,
 ): KnockoutMatch {
-  const { ga: gh, gb: ga } = sampleScore(teams[homeIdx], teams[awayIdx], rng, true, stage);
+  const { ga: gh, gb: ga } = sampleScore(teams[homeIdx], teams[awayIdx], rng, true, stage, fatigueHome, fatigueAway);
   let winnerIdx: number;
   let loserIdx: number;
   let drawn = false;

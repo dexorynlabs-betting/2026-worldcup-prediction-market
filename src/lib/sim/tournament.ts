@@ -166,12 +166,22 @@ export function simulateTournament(
     throw new Error(`Unknown slot reference: ${slot}`);
   };
 
+  // Post-ET fatigue (Tier 1 #5): a team that won its previous KO match in
+  // extra time / penalties carries fatigue into the next round. Cleared and
+  // re-set per round. Group stage never sets it (no ET in groups).
+  const etFatigue: boolean[] = new Array(teams.length).fill(false);
+
   // === 4) Run knockout rounds ===
   const runRound = (matches: BracketSlot[], reachedStage: Stage, nextStage: Stage, fixtureStage: 'r32'|'r16'|'qf'|'sf'|'final'|'3rd') => {
+    // Snapshot incoming fatigue so within-round updates don't bleed.
+    const entryFatigue = etFatigue.slice();
     for (const m of matches) {
       const homeIdx = resolveSlot(m.home, m.id, 'home');
       const awayIdx = resolveSlot(m.away, m.id, 'away');
-      const r = simulateKnockout(homeIdx, awayIdx, teams, rng, fixtureStage);
+      const r = simulateKnockout(
+        homeIdx, awayIdx, teams, rng, fixtureStage,
+        entryFatigue[homeIdx], entryFatigue[awayIdx],
+      );
       matchWinner.set(m.id, r.winnerIdx);
       matchLoser.set(m.id, r.loserIdx);
       goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
@@ -179,6 +189,9 @@ export function simulateTournament(
       stageReached[homeIdx] = furthestStage(stageReached[homeIdx], reachedStage);
       stageReached[awayIdx] = furthestStage(stageReached[awayIdx], reachedStage);
       stageReached[r.winnerIdx] = furthestStage(stageReached[r.winnerIdx], nextStage);
+      // Update fatigue for the next round: winner inherits the ET flag, loser is out.
+      etFatigue[r.winnerIdx] = r.drawn;
+      etFatigue[r.loserIdx] = false;
       onFixture?.(fixtureStage, String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
     }
   };
@@ -194,7 +207,10 @@ export function simulateTournament(
     const m = BRACKET.third_place;
     const homeIdx = resolveSlot(m.home, m.id, 'home');
     const awayIdx = resolveSlot(m.away, m.id, 'away');
-    const r = simulateKnockout(homeIdx, awayIdx, teams, rng, '3rd');
+    const r = simulateKnockout(
+      homeIdx, awayIdx, teams, rng, '3rd',
+      etFatigue[homeIdx], etFatigue[awayIdx],
+    );
     matchWinner.set(m.id, r.winnerIdx);
     matchLoser.set(m.id, r.loserIdx);
     goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
@@ -209,7 +225,10 @@ export function simulateTournament(
     const m = BRACKET.final;
     const homeIdx = resolveSlot(m.home, m.id, 'home');
     const awayIdx = resolveSlot(m.away, m.id, 'away');
-    const r = simulateKnockout(homeIdx, awayIdx, teams, rng, 'final');
+    const r = simulateKnockout(
+      homeIdx, awayIdx, teams, rng, 'final',
+      etFatigue[homeIdx], etFatigue[awayIdx],
+    );
     matchWinner.set(m.id, r.winnerIdx);
     matchLoser.set(m.id, r.loserIdx);
     goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;

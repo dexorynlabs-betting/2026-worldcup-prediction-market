@@ -36,12 +36,33 @@ goals  ~ Poisson(λ_team)`}</Formula>
         <p className="text-sm text-fg-2">{t('poisson_explain')}</p>
       </Section>
 
+      <Section title={t('recent_title')}>
+        <p>{t('recent_body')}</p>
+        <Formula>{t('recent_formula')}</Formula>
+      </Section>
+
+      <Section title={t('host_title')}>
+        <p>{t('host_body')}</p>
+      </Section>
+
+      <Section title={t('absences_title')}>
+        <p>{t('absences_body')}</p>
+        <Formula>{t('absences_formula')}</Formula>
+        <p className="text-sm text-fg-2">{t('absences_explain')}</p>
+      </Section>
+
+      <Section title={t('rest_title')}>
+        <p>{t('rest_body')}</p>
+      </Section>
+
       <Section title={t('groups_title')}>
         <p>{t('groups_body')}</p>
       </Section>
 
       <Section title={t('knockout_title')}>
         <p>{t('knockout_body')}</p>
+        <Formula>{t('knockout_formula')}</Formula>
+        <p className="text-sm text-fg-2">{t('knockout_explain')}</p>
         <p className="mt-3 text-sm text-fg-2">{t('knockout_note')}</p>
       </Section>
 
