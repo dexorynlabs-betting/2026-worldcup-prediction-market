@@ -10,6 +10,7 @@ import { ScoreHeatmap } from './ScoreHeatmap';
 import { buildMatchStats } from '@/lib/sim/match-stats';
 import { getScorers } from '@/lib/sim/scorers';
 import { cn, formatPct } from '@/lib/utils';
+import { AbsenceBadge } from './TeamAbsencesPanel';
 import type { SerializedResult } from '@/lib/sim/worker';
 
 interface Props { result: SerializedResult; }
@@ -163,6 +164,7 @@ function TeamSide({ team, mean, alignRight = false }: { team: { id: string; flag
       <span className="font-mono text-[10px] text-fg-3 tabular">
         ELO {team.elo} · μ {mean.toFixed(2)}
       </span>
+      <AbsenceBadge teamId={team.id} />
     </div>
   );
 }

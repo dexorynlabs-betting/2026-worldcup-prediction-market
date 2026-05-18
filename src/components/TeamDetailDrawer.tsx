@@ -8,6 +8,7 @@ import { useSelection } from '@/hooks/useSelection';
 import { Flag } from './Flag';
 import { cn, formatPct } from '@/lib/utils';
 import { getScorers } from '@/lib/sim/scorers';
+import { TeamAbsencesPanel, AbsenceBadge } from './TeamAbsencesPanel';
 import type { SerializedResult } from '@/lib/sim/worker';
 
 interface Props { result: SerializedResult; }
@@ -111,8 +112,9 @@ export function TeamDetailDrawer({ result }: Props) {
                     <h2 className="font-display text-3xl font-bold text-fg-0">
                       {locale === 'es' ? team.name_es : team.name_en}
                     </h2>
-                    <div className="mt-1 flex gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-fg-3">
+                    <div className="mt-1 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-fg-3">
                       <span>ELO <span className="text-fg-0 tabular">{team.elo}</span></span>
+                      <AbsenceBadge teamId={team.id} />
                       <span>·</span>
                       <span>Rank #<span className="text-fg-0 tabular">{data.eloRank}</span></span>
                       {data.group && (<><span>·</span><span>Grupo <span className="text-fg-0">{data.group}</span></span></>)}
@@ -165,6 +167,9 @@ export function TeamDetailDrawer({ result }: Props) {
                   <StatBlock label="Goles esperados (GF)" value={data.avgGF.toFixed(2)} sub="promedio por torneo" tone="emerald" />
                   <StatBlock label="Goles esperados (GC)" value={data.avgGA.toFixed(2)} sub="promedio por torneo" tone="rose" />
                 </section>
+
+                {/* Current absences (injuries / suspensions) */}
+                <TeamAbsencesPanel teamId={team.id} />
 
                 {/* Top scorers */}
                 {data.topScorers.length > 0 && (
