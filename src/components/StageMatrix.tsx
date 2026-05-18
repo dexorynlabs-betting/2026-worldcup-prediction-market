@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Flag } from './Flag';
-import { cn, formatPct } from '@/lib/utils';
+import { cn, formatPct, wilsonCI, formatCIBand } from '@/lib/utils';
 import { useSelection } from '@/hooks/useSelection';
 import type { SerializedResult } from '@/lib/sim/worker';
 
@@ -42,16 +42,25 @@ export function StageMatrix({ result }: Props) {
   const [hoverCol, setHoverCol] = useState<string | null>(null);
 
   const rows = useMemo(() => {
+    const N = result.numSimulations;
     const all = result.teams.map((team, i) => ({
       team,
       idx: i,
       values: {
-        r32:   result.stageCounts.r32[i] / result.numSimulations,
-        r16:   result.stageCounts.r16[i] / result.numSimulations,
-        qf:    result.stageCounts.qf[i] / result.numSimulations,
-        sf:    result.stageCounts.sf[i] / result.numSimulations,
-        final: result.stageCounts.final[i] / result.numSimulations,
-        champ: result.stageCounts.champion[i] / result.numSimulations,
+        r32:   result.stageCounts.r32[i] / N,
+        r16:   result.stageCounts.r16[i] / N,
+        qf:    result.stageCounts.qf[i] / N,
+        sf:    result.stageCounts.sf[i] / N,
+        final: result.stageCounts.final[i] / N,
+        champ: result.stageCounts.champion[i] / N,
+      },
+      counts: {
+        r32:   result.stageCounts.r32[i],
+        r16:   result.stageCounts.r16[i],
+        qf:    result.stageCounts.qf[i],
+        sf:    result.stageCounts.sf[i],
+        final: result.stageCounts.final[i],
+        champ: result.stageCounts.champion[i],
       },
       elo: team.elo,
     }));
@@ -147,6 +156,10 @@ export function StageMatrix({ result }: Props) {
                 {STAGE_COLS.map((col) => {
                   const v = row.values[col.key];
                   const dim = hoverCol !== null && hoverCol !== col.key && hoverRow !== row.idx;
+                  const ci = wilsonCI(row.counts[col.key], result.numSimulations);
+                  const tip = v > 0
+                    ? `${formatPct(v, 2)} (IC 95% ${formatCIBand(ci.lo, ci.hi, 2)}, n=${result.numSimulations.toLocaleString()})`
+                    : undefined;
                   return (
                     <td
                       key={col.key}
@@ -155,6 +168,7 @@ export function StageMatrix({ result }: Props) {
                         backgroundColor: colorFor(v),
                         opacity: dim ? 0.35 : 1,
                       }}
+                      title={tip}
                       onMouseEnter={() => setHoverCol(col.key)}
                       onMouseLeave={() => setHoverCol(null)}
                     >

@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import { X } from 'lucide-react';
 import { useSelection } from '@/hooks/useSelection';
 import { Flag } from './Flag';
-import { cn, formatPct } from '@/lib/utils';
+import { cn, formatPct, wilsonCI, formatCIBand } from '@/lib/utils';
 import { getScorers } from '@/lib/sim/scorers';
 import { TeamAbsencesPanel, AbsenceBadge } from './TeamAbsencesPanel';
 import type { SerializedResult } from '@/lib/sim/worker';
@@ -151,22 +151,33 @@ export function TeamDetailDrawer({ result, resultNoAbsences }: Props) {
               <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
                 {/* Best/Worst case */}
                 <section className="grid grid-cols-2 gap-3">
-                  <BestWorstCard tone="gold" label="Probabilidad campeón" value={data.wasChamp} caption="Mejor caso" />
-                  <BestWorstCard tone="rose" label="Fuera en fase de grupos" value={data.outInGroups} caption="Peor caso" />
+                  <BestWorstCard
+                    tone="gold" label="Probabilidad campeón" caption="Mejor caso"
+                    value={data.wasChamp}
+                    ci={wilsonCI(result.stageCounts.champion[teamIdx], result.numSimulations)}
+                  />
+                  <BestWorstCard
+                    tone="rose" label="Fuera en fase de grupos" caption="Peor caso"
+                    value={data.outInGroups}
+                    ci={wilsonCI(result.numSimulations - result.stageCounts.r32[teamIdx], result.numSimulations)}
+                  />
                 </section>
 
                 {/* Stage probabilities */}
                 <section>
-                  <h3 className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-fg-3">
-                    Probabilidad de llegar a cada ronda
-                  </h3>
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-3">
+                      Probabilidad de llegar a cada ronda
+                    </h3>
+                    <span className="font-mono text-[9px] text-fg-3">IC 95%</span>
+                  </div>
                   <div className="space-y-1.5">
-                    <StageBar label="Octavos (R32)" value={data.reachR32} />
-                    <StageBar label="16vos (R16)"   value={data.reachR16} />
-                    <StageBar label="Cuartos"        value={data.reachQF} />
-                    <StageBar label="Semifinal"      value={data.reachSF} />
-                    <StageBar label="Final"          value={data.reachFinal} />
-                    <StageBar label="Campeón"        value={data.wasChamp} tone="gold" />
+                    <StageBar label="Octavos (R32)" value={data.reachR32}  count={result.stageCounts.r32[teamIdx]}      n={result.numSimulations} />
+                    <StageBar label="16vos (R16)"   value={data.reachR16}  count={result.stageCounts.r16[teamIdx]}      n={result.numSimulations} />
+                    <StageBar label="Cuartos"        value={data.reachQF}   count={result.stageCounts.qf[teamIdx]}       n={result.numSimulations} />
+                    <StageBar label="Semifinal"      value={data.reachSF}   count={result.stageCounts.sf[teamIdx]}       n={result.numSimulations} />
+                    <StageBar label="Final"          value={data.reachFinal} count={result.stageCounts.final[teamIdx]}    n={result.numSimulations} />
+                    <StageBar label="Campeón"        value={data.wasChamp}  count={result.stageCounts.champion[teamIdx]} n={result.numSimulations} tone="gold" />
                   </div>
                 </section>
 
@@ -334,7 +345,15 @@ function findGroupFixtures(teamId: string, result: SerializedResult) {
   return out;
 }
 
-function BestWorstCard({ tone, label, value, caption }: { tone: 'gold' | 'rose'; label: string; value: number; caption: string }) {
+function BestWorstCard({
+  tone, label, value, caption, ci,
+}: {
+  tone: 'gold' | 'rose';
+  label: string;
+  value: number;
+  caption: string;
+  ci?: { lo: number; hi: number };
+}) {
   const colors = {
     gold: 'border-gold/40 bg-gradient-to-br from-gold/15 to-transparent',
     rose: 'border-rose/40 bg-gradient-to-br from-rose/10 to-transparent',
@@ -346,17 +365,38 @@ function BestWorstCard({ tone, label, value, caption }: { tone: 'gold' | 'rose';
       <div className={cn('mt-2 font-display text-3xl font-bold tabular', tone === 'gold' ? 'text-gold' : 'text-rose')}>
         {formatPct(value, 1)}
       </div>
+      {ci && (
+        <div className="mt-1 font-mono text-[9px] tabular text-fg-3">
+          IC 95% {formatCIBand(ci.lo, ci.hi, 1)}
+        </div>
+      )}
     </div>
   );
 }
 
-function StageBar({ label, value, tone = 'emerald' }: { label: string; value: number; tone?: 'emerald' | 'gold' }) {
+function StageBar({
+  label, value, tone = 'emerald', count, n,
+}: {
+  label: string;
+  value: number;
+  tone?: 'emerald' | 'gold';
+  count?: number;
+  n?: number;
+}) {
+  const ci = count != null && n != null ? wilsonCI(count, n) : null;
   return (
     <div className="flex items-center gap-3">
       <span className="w-28 text-xs text-fg-2">{label}</span>
       <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-bg-2/60">
+        {ci && (
+          <div
+            aria-hidden
+            className="absolute top-0 h-full bg-fg-3/25"
+            style={{ left: `${ci.lo * 100}%`, width: `${(ci.hi - ci.lo) * 100}%` }}
+          />
+        )}
         <div
-          className="h-full rounded-full"
+          className="relative h-full rounded-full"
           style={{
             width: `${value * 100}%`,
             background: tone === 'gold'
@@ -365,7 +405,14 @@ function StageBar({ label, value, tone = 'emerald' }: { label: string; value: nu
           }}
         />
       </div>
-      <span className="w-14 text-right font-mono text-xs tabular text-fg-0">{formatPct(value, 1)}</span>
+      <div className="w-20 text-right">
+        <div className="font-mono text-xs tabular text-fg-0">{formatPct(value, 1)}</div>
+        {ci && (
+          <div className="font-mono text-[9px] tabular text-fg-3" title="95% Wilson confidence interval">
+            {formatCIBand(ci.lo, ci.hi, 1)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

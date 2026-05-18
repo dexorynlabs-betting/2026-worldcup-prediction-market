@@ -70,6 +70,11 @@ goals  ~ Poisson(λ_team)`}</Formula>
         <p>{t('mc_body')}</p>
       </Section>
 
+      <Section title={t('ci_title')}>
+        <p>{t('ci_body')}</p>
+        <Formula>{t('ci_formula')}</Formula>
+      </Section>
+
       <Section title={t('perf_title')}>
         <p>{t('perf_body')}</p>
       </Section>

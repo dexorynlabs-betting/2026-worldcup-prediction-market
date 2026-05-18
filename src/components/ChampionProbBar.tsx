@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { Flag } from './Flag';
-import { cn, formatPct } from '@/lib/utils';
+import { cn, formatPct, wilsonCI, formatCIHalf } from '@/lib/utils';
 import { useSelection } from '@/hooks/useSelection';
 import type { SerializedResult } from '@/lib/sim/worker';
 
@@ -18,13 +18,18 @@ export function ChampionProbBar({ result }: Props) {
   const openTeam = useSelection((s) => s.openTeam);
 
   const rows = result.teams
-    .map((team, i) => ({
-      team,
-      idx: i,
-      pct: result.stageCounts.champion[i] / result.numSimulations,
-      avgGF: result.totalGoalsFor[i] / result.numSimulations,
-      avgGA: result.totalGoalsAgainst[i] / result.numSimulations,
-    }))
+    .map((team, i) => {
+      const count = result.stageCounts.champion[i];
+      const ci = wilsonCI(count, result.numSimulations);
+      return {
+        team,
+        idx: i,
+        pct: count / result.numSimulations,
+        ci,
+        avgGF: result.totalGoalsFor[i] / result.numSimulations,
+        avgGA: result.totalGoalsAgainst[i] / result.numSimulations,
+      };
+    })
     .filter((r) => r.pct > 0)
     .sort((a, b) => b.pct - a.pct)
     .slice(0, 16);
@@ -103,7 +108,10 @@ export function ChampionProbBar({ result }: Props) {
               />
             </div>
             <div className="text-right font-mono text-sm font-medium tabular text-fg-0">
-              {formatPct(r.pct, 2)}
+              <div>{formatPct(r.pct, 2)}</div>
+              <div className="text-[9px] font-normal text-fg-3" title={`95% CI: ${formatPct(r.ci.lo, 2)}–${formatPct(r.ci.hi, 2)}`}>
+                {formatCIHalf(r.ci.halfWidth)}
+              </div>
             </div>
 
             {i === 0 && (
