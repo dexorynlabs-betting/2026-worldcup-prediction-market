@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { Flag } from './Flag';
@@ -10,29 +10,38 @@ import type { SerializedResult } from '@/lib/sim/worker';
 
 interface Props {
   result: SerializedResult;
+  /** Counterfactual run with absences disabled. When present, enables the with/without toggle. */
+  resultNoAbsences?: SerializedResult | null;
 }
 
-export function ChampionProbBar({ result }: Props) {
+export function ChampionProbBar({ result, resultNoAbsences }: Props) {
   const t = useTranslations('champion');
   const containerRef = useRef<HTMLDivElement>(null);
   const openTeam = useSelection((s) => s.openTeam);
+  const [mode, setMode] = useState<'with' | 'without'>('with');
 
-  const rows = result.teams
-    .map((team, i) => {
-      const count = result.stageCounts.champion[i];
-      const ci = wilsonCI(count, result.numSimulations);
-      return {
-        team,
-        idx: i,
-        pct: count / result.numSimulations,
-        ci,
-        avgGF: result.totalGoalsFor[i] / result.numSimulations,
-        avgGA: result.totalGoalsAgainst[i] / result.numSimulations,
-      };
-    })
-    .filter((r) => r.pct > 0)
-    .sort((a, b) => b.pct - a.pct)
-    .slice(0, 16);
+  // Switch the source result when the toggle changes (no-op if the
+  // counterfactual run wasn't provided).
+  const active = mode === 'without' && resultNoAbsences ? resultNoAbsences : result;
+
+  const rows = useMemo(() => (
+    active.teams
+      .map((team, i) => {
+        const count = active.stageCounts.champion[i];
+        const ci = wilsonCI(count, active.numSimulations);
+        return {
+          team,
+          idx: i,
+          pct: count / active.numSimulations,
+          ci,
+          avgGF: active.totalGoalsFor[i] / active.numSimulations,
+          avgGA: active.totalGoalsAgainst[i] / active.numSimulations,
+        };
+      })
+      .filter((r) => r.pct > 0)
+      .sort((a, b) => b.pct - a.pct)
+      .slice(0, 16)
+  ), [active]);
 
   const max = rows[0]?.pct ?? 1;
 
@@ -51,17 +60,45 @@ export function ChampionProbBar({ result }: Props) {
         transformOrigin: 'left',
       },
     );
-  }, [result]);
+  }, [active]);
 
   return (
     <section id="champion" className="mx-auto max-w-[1280px] px-6 py-20">
-      <header className="mb-10">
-        <h2 className="font-display text-4xl font-bold tracking-tight text-fg-0 sm:text-5xl">
-          {t('title')}
-        </h2>
-        <p className="mt-2 text-sm text-fg-2">
-          {t('subtitle', { n: result.numSimulations.toLocaleString() })}
-        </p>
+      <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="font-display text-4xl font-bold tracking-tight text-fg-0 sm:text-5xl">
+            {t('title')}
+          </h2>
+          <p className="mt-2 text-sm text-fg-2">
+            {t('subtitle', { n: active.numSimulations.toLocaleString() })}
+          </p>
+        </div>
+        {resultNoAbsences && (
+          <div className="inline-flex items-center gap-1 rounded-full border border-border bg-bg-1/50 p-1 text-xs">
+            <button
+              onClick={() => setMode('with')}
+              className={cn(
+                'rounded-full px-3 py-1 font-mono uppercase tracking-[0.14em] text-[10px] transition-colors',
+                mode === 'with'
+                  ? 'bg-rose/15 text-rose'
+                  : 'text-fg-3 hover:text-fg-1',
+              )}
+            >
+              Con lesiones
+            </button>
+            <button
+              onClick={() => setMode('without')}
+              className={cn(
+                'rounded-full px-3 py-1 font-mono uppercase tracking-[0.14em] text-[10px] transition-colors',
+                mode === 'without'
+                  ? 'bg-emerald/15 text-emerald'
+                  : 'text-fg-3 hover:text-fg-1',
+              )}
+            >
+              Sin lesiones
+            </button>
+          </div>
+        )}
       </header>
 
       <div ref={containerRef} className="space-y-2">

@@ -97,39 +97,67 @@ export function SimsExplorer({ teamIdx, result }: Props) {
     [result.sampleSims, teamIdx],
   );
 
-  // Bucket counts by outcome
-  const buckets = useMemo(() => {
+  // Sample counts per outcome (the trajectories we kept for inspection).
+  const sampleBuckets = useMemo(() => {
     const map = new Map<Outcome, TeamPath[]>();
     for (const o of OUTCOME_ORDER) map.set(o, []);
     for (const p of paths) map.get(p.outcome)!.push(p);
     return map;
   }, [paths]);
 
-  const total = paths.length;
-  if (total === 0) return null;
+  // Full-N counts per outcome. Computed from the aggregate stageCounts so the
+  // displayed numbers add up to numSimulations (e.g. 100k) — the sample of
+  // 300 stored trajectories is only used to populate the inline detail list.
+  const fullCounts = useMemo<Record<Outcome, number>>(() => {
+    const sc = result.stageCounts;
+    const i = teamIdx;
+    const N = result.numSimulations;
+    const champion = sc.champion[i];
+    const reachedFinal = sc.final[i];
+    const reachedSF = sc.sf[i];
+    const third = sc.third[i];
+    const reachedQF = sc.qf[i];
+    const reachedR16 = sc.r16[i];
+    const reachedR32 = sc.r32[i];
+    return {
+      champion,
+      runnerUp: reachedFinal - champion,
+      third,
+      fourth: reachedSF - reachedFinal - third,
+      sf: 0, // every SF participant ends as 3rd or 4th — there is no "lost in SF" bucket
+      qf: reachedQF - reachedSF,
+      r16: reachedR16 - reachedQF,
+      r32: reachedR32 - reachedR16,
+      group: N - reachedR32,
+    };
+  }, [result, teamIdx]);
+
+  const sampleTotal = paths.length;
+  if (sampleTotal === 0) return null;
 
   const [selected, setSelected] = useState<Outcome | null>(() => {
     // Default to the highest non-empty bucket so the user sees something interesting first.
     for (const o of OUTCOME_ORDER) {
-      if ((buckets.get(o)?.length ?? 0) > 0) return o;
+      if ((sampleBuckets.get(o)?.length ?? 0) > 0) return o;
     }
     return null;
   });
   const [expanded, setExpanded] = useState<number | null>(null);
 
-  const selectedPaths = selected ? buckets.get(selected) ?? [] : [];
+  const selectedPaths = selected ? sampleBuckets.get(selected) ?? [] : [];
 
   return (
     <section>
       <h3 className="mb-3 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-fg-3">
-        <span>Explorar simulaciones <span className="text-fg-3">· {total} muestreadas de {result.numSimulations.toLocaleString()}</span></span>
+        <span>Explorar simulaciones <span className="text-fg-3">· sobre {result.numSimulations.toLocaleString()} torneos</span></span>
       </h3>
 
       <div className="mb-3 grid grid-cols-3 gap-1.5 sm:grid-cols-5">
         {OUTCOME_ORDER.map((o) => {
-          const n = buckets.get(o)?.length ?? 0;
-          if (n === 0) return null;
-          const pct = n / total;
+          const n = fullCounts[o];
+          if (n <= 0) return null;
+          const pct = n / result.numSimulations;
+          const sample = sampleBuckets.get(o)?.length ?? 0;
           const isSel = selected === o;
           return (
             <button
@@ -144,8 +172,13 @@ export function SimsExplorer({ teamIdx, result }: Props) {
             >
               <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-fg-3">{OUTCOME_LABEL[o]}</div>
               <div className="mt-0.5 flex items-baseline gap-1.5">
-                <span className={cn('font-display text-lg font-bold tabular', isSel ? 'text-gold' : 'text-fg-0')}>{n}</span>
-                <span className="font-mono text-[10px] tabular text-fg-3">{formatPct(pct, 0)}</span>
+                <span className={cn('font-display text-lg font-bold tabular', isSel ? 'text-gold' : 'text-fg-0')}>
+                  {n.toLocaleString()}
+                </span>
+                <span className="font-mono text-[10px] tabular text-fg-3">{formatPct(pct, 1)}</span>
+              </div>
+              <div className="mt-0.5 font-mono text-[9px] tabular text-fg-3">
+                {sample > 0 ? `${sample} muestra` : '—'}
               </div>
               <div className="absolute inset-x-0 bottom-0 h-0.5 bg-bg-2/50">
                 <div
@@ -161,8 +194,10 @@ export function SimsExplorer({ teamIdx, result }: Props) {
       {selected && (
         <div className="space-y-1.5">
           <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-3">
-            {selectedPaths.length} simulación{selectedPaths.length === 1 ? '' : 'es'} · {OUTCOME_LABEL[selected]}
-            <span className="ml-2 text-fg-3">· click para ver detalle</span>
+            {OUTCOME_LABEL[selected]}: {fullCounts[selected].toLocaleString()} sims totales
+            <span className="ml-2 text-fg-3">
+              · {selectedPaths.length} ejemplo{selectedPaths.length === 1 ? '' : 's'} muestreado{selectedPaths.length === 1 ? '' : 's'} · click para ver detalle
+            </span>
           </div>
           {selectedPaths.slice(0, 50).map((p, i) => {
             const isExpanded = expanded === p.sim.simIdx;
@@ -226,7 +261,7 @@ export function SimsExplorer({ teamIdx, result }: Props) {
       )}
 
       <p className="mt-3 text-[10px] text-fg-3 leading-relaxed">
-        Muestra de simulaciones completas del Monte Carlo de {result.numSimulations.toLocaleString()} torneos. Cada barra de probabilidad arriba se construye con todas las {result.numSimulations.toLocaleString()}, este panel deja inspeccionar trayectorias individuales.
+        Los conteos arriba (Campeón, Subcampeón, ...) son sobre las {result.numSimulations.toLocaleString()} simulaciones completas — suman {result.numSimulations.toLocaleString()}. Para que puedas inspeccionar trayectorias sin gastar 200 MB de memoria, el motor guarda solo {paths.length} torneos completos como ejemplo (uno cada {Math.max(1, Math.round(result.numSimulations / paths.length))} sims) — esos son los que se listan debajo.
       </p>
     </section>
   );

@@ -42,7 +42,7 @@ export function Dashboard() {
 
           <div id="resumen" className="scroll-mt-32">
             <PredictionDelta result={state.result} />
-            <ChampionProbBar result={state.result} />
+            <ChampionProbBar result={state.result} resultNoAbsences={state.resultNoAbsences} />
             <StageMatrix result={state.result} />
           </div>
 
