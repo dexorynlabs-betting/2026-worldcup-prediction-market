@@ -10,6 +10,9 @@
     "fetch-odds": "tsx scripts/fetch-odds.ts",
     "fetch-backtest": "tsx scripts/fetch-backtest.ts",
     "fetch-absences": "tsx scripts/fetch-absences.ts",
+    "fetch-results": "tsx scripts/fetch-results.ts",
+    "fetch-cards": "tsx scripts/fetch-cards.ts",
+    "snapshot-run": "tsx scripts/snapshot-run.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

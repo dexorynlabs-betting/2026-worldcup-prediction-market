@@ -13,6 +13,7 @@ import { SurpriseCards } from './SurpriseCards';
 import { MatchCalendar } from './MatchCalendar';
 import { TournamentStats } from './TournamentStats';
 import { MarketEdge } from './MarketEdge';
+import { PredictionDelta } from './PredictionDelta';
 import { TeamDetailDrawer } from './TeamDetailDrawer';
 import { MatchDetailDrawer } from './MatchDetailDrawer';
 import { SectionNav } from './layout/SectionNav';
@@ -40,6 +41,7 @@ export function Dashboard() {
           <SectionNav />
 
           <div id="resumen" className="scroll-mt-32">
+            <PredictionDelta result={state.result} />
             <ChampionProbBar result={state.result} />
             <StageMatrix result={state.result} />
           </div>

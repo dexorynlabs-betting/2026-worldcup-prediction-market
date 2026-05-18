@@ -2,6 +2,7 @@ import type { Team, TournamentResult, Stage, GroupFinish } from './types';
 import { simulateGroup, compareStandings, type TeamStanding } from './group';
 import { simulateKnockout } from './knockout';
 import type { XoshiroRNG } from './rng';
+import { getKnockoutResult } from './state';
 
 import groupsData from '@/data/groups.json';
 import bracketData from '@/data/bracket.json';
@@ -76,7 +77,7 @@ export function simulateTournament(
       goalsFor[h] += gh; goalsAgainst[h] += ga;
       goalsFor[a] += ga; goalsAgainst[a] += gh;
       onFixture?.('group', `${letter}:${pairIdx}`, letter, h, a, gh, ga);
-    });
+    }, letter);
     groupStandings[letter] = standings;
   }
 
@@ -178,21 +179,57 @@ export function simulateTournament(
     for (const m of matches) {
       const homeIdx = resolveSlot(m.home, m.id, 'home');
       const awayIdx = resolveSlot(m.away, m.id, 'away');
-      const r = simulateKnockout(
-        homeIdx, awayIdx, teams, rng, fixtureStage,
-        entryFatigue[homeIdx], entryFatigue[awayIdx],
-      );
-      matchWinner.set(m.id, r.winnerIdx);
-      matchLoser.set(m.id, r.loserIdx);
-      goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
-      goalsFor[awayIdx] += r.ga; goalsAgainst[awayIdx] += r.gh;
+
+      // Tier 1.5: short-circuit if this match has already been played in real
+      // life. Only honor the state entry when both teams match the resolved
+      // bracket slot — otherwise the engine has computed a counterfactual
+      // bracket (e.g. third-place placement differed) and the live result
+      // doesn't apply.
+      const live = getKnockoutResult(m.id);
+      let winnerIdx: number;
+      let loserIdx: number;
+      let gh: number;
+      let ga: number;
+      let drawnInRegulation: boolean;
+      if (live && live.home === teams[homeIdx].id && live.away === teams[awayIdx].id) {
+        gh = live.gh;
+        ga = live.ga;
+        drawnInRegulation = !!(live.went_to_et || live.went_to_pk);
+        if (live.went_to_pk && live.pk_winner) {
+          winnerIdx = live.pk_winner === teams[homeIdx].id ? homeIdx : awayIdx;
+        } else if (gh > ga) {
+          winnerIdx = homeIdx;
+        } else if (ga > gh) {
+          winnerIdx = awayIdx;
+        } else {
+          // Drawn at 90' / ET with no pk_winner field — should not occur for a
+          // completed knockout, but fall back to higher-ELO winner deterministically.
+          winnerIdx = teams[homeIdx].elo >= teams[awayIdx].elo ? homeIdx : awayIdx;
+        }
+        loserIdx = winnerIdx === homeIdx ? awayIdx : homeIdx;
+      } else {
+        const r = simulateKnockout(
+          homeIdx, awayIdx, teams, rng, fixtureStage,
+          entryFatigue[homeIdx], entryFatigue[awayIdx],
+        );
+        winnerIdx = r.winnerIdx;
+        loserIdx = r.loserIdx;
+        gh = r.gh;
+        ga = r.ga;
+        drawnInRegulation = r.drawn;
+      }
+
+      matchWinner.set(m.id, winnerIdx);
+      matchLoser.set(m.id, loserIdx);
+      goalsFor[homeIdx] += gh; goalsAgainst[homeIdx] += ga;
+      goalsFor[awayIdx] += ga; goalsAgainst[awayIdx] += gh;
       stageReached[homeIdx] = furthestStage(stageReached[homeIdx], reachedStage);
       stageReached[awayIdx] = furthestStage(stageReached[awayIdx], reachedStage);
-      stageReached[r.winnerIdx] = furthestStage(stageReached[r.winnerIdx], nextStage);
+      stageReached[winnerIdx] = furthestStage(stageReached[winnerIdx], nextStage);
       // Update fatigue for the next round: winner inherits the ET flag, loser is out.
-      etFatigue[r.winnerIdx] = r.drawn;
-      etFatigue[r.loserIdx] = false;
-      onFixture?.(fixtureStage, String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
+      etFatigue[winnerIdx] = drawnInRegulation;
+      etFatigue[loserIdx] = false;
+      onFixture?.(fixtureStage, String(m.id), undefined, homeIdx, awayIdx, gh, ga);
     }
   };
 
@@ -203,39 +240,50 @@ export function simulateTournament(
 
   // 3rd place playoff (losers of SF). Both teams stay at stageReached='sf' —
   // winning bronze doesn't bump the stage. Bronze is tracked via thirdPlace below.
-  {
-    const m = BRACKET.third_place;
+  const playSpecial = (m: BracketSlot, fixtureStage: '3rd' | 'final'): void => {
     const homeIdx = resolveSlot(m.home, m.id, 'home');
     const awayIdx = resolveSlot(m.away, m.id, 'away');
-    const r = simulateKnockout(
-      homeIdx, awayIdx, teams, rng, '3rd',
-      etFatigue[homeIdx], etFatigue[awayIdx],
-    );
-    matchWinner.set(m.id, r.winnerIdx);
-    matchLoser.set(m.id, r.loserIdx);
-    goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
-    goalsFor[awayIdx] += r.ga; goalsAgainst[awayIdx] += r.gh;
-    onFixture?.('3rd', String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
-  }
+    const live = getKnockoutResult(m.id);
+    let winnerIdx: number, loserIdx: number, gh: number, ga: number;
+    if (live && live.home === teams[homeIdx].id && live.away === teams[awayIdx].id) {
+      gh = live.gh;
+      ga = live.ga;
+      if (live.went_to_pk && live.pk_winner) {
+        winnerIdx = live.pk_winner === teams[homeIdx].id ? homeIdx : awayIdx;
+      } else if (gh > ga) {
+        winnerIdx = homeIdx;
+      } else if (ga > gh) {
+        winnerIdx = awayIdx;
+      } else {
+        winnerIdx = teams[homeIdx].elo >= teams[awayIdx].elo ? homeIdx : awayIdx;
+      }
+      loserIdx = winnerIdx === homeIdx ? awayIdx : homeIdx;
+    } else {
+      const r = simulateKnockout(
+        homeIdx, awayIdx, teams, rng, fixtureStage,
+        etFatigue[homeIdx], etFatigue[awayIdx],
+      );
+      winnerIdx = r.winnerIdx;
+      loserIdx = r.loserIdx;
+      gh = r.gh;
+      ga = r.ga;
+    }
+    matchWinner.set(m.id, winnerIdx);
+    matchLoser.set(m.id, loserIdx);
+    goalsFor[homeIdx] += gh; goalsAgainst[homeIdx] += ga;
+    goalsFor[awayIdx] += ga; goalsAgainst[awayIdx] += gh;
+    if (fixtureStage === 'final') {
+      stageReached[winnerIdx] = 'champion';
+    }
+    onFixture?.(fixtureStage, String(m.id), undefined, homeIdx, awayIdx, gh, ga);
+  };
+
+  playSpecial(BRACKET.third_place, '3rd');
   const thirdPlace = matchWinner.get(BRACKET.third_place.id)!;
   const fourthPlace = matchLoser.get(BRACKET.third_place.id)!;
 
   // Final
-  {
-    const m = BRACKET.final;
-    const homeIdx = resolveSlot(m.home, m.id, 'home');
-    const awayIdx = resolveSlot(m.away, m.id, 'away');
-    const r = simulateKnockout(
-      homeIdx, awayIdx, teams, rng, 'final',
-      etFatigue[homeIdx], etFatigue[awayIdx],
-    );
-    matchWinner.set(m.id, r.winnerIdx);
-    matchLoser.set(m.id, r.loserIdx);
-    goalsFor[homeIdx] += r.gh; goalsAgainst[homeIdx] += r.ga;
-    goalsFor[awayIdx] += r.ga; goalsAgainst[awayIdx] += r.gh;
-    stageReached[r.winnerIdx] = 'champion';
-    onFixture?.('final', String(m.id), undefined, homeIdx, awayIdx, r.gh, r.ga);
-  }
+  playSpecial(BRACKET.final, 'final');
   const champion = matchWinner.get(BRACKET.final.id)!;
   const runnerUp = matchLoser.get(BRACKET.final.id)!;
 

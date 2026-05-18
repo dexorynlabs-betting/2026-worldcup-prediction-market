@@ -9,6 +9,7 @@ import {
   DEFAULT_ABSENCE_WEIGHTS,
   type Stage,
 } from './absences';
+import { liveSuspensions } from './state';
 
 /**
  * Recent-form blend (Tier 1 #2, calibrated 2026-05-17 via backtest sweep).
@@ -43,7 +44,10 @@ export function recentFormAdjustment(team: Team): number {
  */
 export function absenceAdjustment(team: Team, stage: Stage = 'group'): number {
   if (!isEngineAbsencesEnabled()) return 0;
-  const list = currentAbsences(team.id);
+  // Pre-tournament absences (injuries snapshot from transfermarkt) +
+  // live in-tournament suspensions derived from card events. Both feed the
+  // same criticality / penalty pipeline.
+  const list = [...currentAbsences(team.id), ...liveSuspensions(team.id)];
   if (list.length === 0) return 0;
   return teamPenalty(list, DEFAULT_ABSENCE_WEIGHTS, stage);
 }
