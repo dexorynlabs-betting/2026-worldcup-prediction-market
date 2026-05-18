@@ -76,6 +76,24 @@ const PER_PLAYER_BASE = 5;
 const PER_PLAYER_RANGE = 75;
 const TEAM_PENALTY_CAP = 150;  // no team can lose more than 150 ELO from absences
 
+/**
+ * Engine-side toggle. When false, `absenceAdjustment` in match.ts returns 0,
+ * effectively disabling the absences penalty in the simulator. UI lookups
+ * (currentAbsences) IGNORE this flag — the absences list keeps rendering so
+ * users can see the data even when running the "no-injuries" scenario.
+ *
+ * Used by the worker to run two passes per Monte Carlo: with absences (default)
+ * and without (counterfactual showing what we'd predict if every flagged
+ * injury were fake/precautionary — a real concern in the pre-tournament window).
+ */
+let _engineAbsencesEnabled = true;
+export function setEngineAbsencesEnabled(v: boolean): void {
+  _engineAbsencesEnabled = v;
+}
+export function isEngineAbsencesEnabled(): boolean {
+  return _engineAbsencesEnabled;
+}
+
 /** Stage ordering used to decide whether an absence applies "from stage X onwards". */
 const STAGE_ORDER: Stage[] = ['group', 'r32', 'r16', 'qf', 'sf', '3rd', 'final'];
 

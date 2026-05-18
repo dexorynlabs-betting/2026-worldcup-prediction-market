@@ -64,7 +64,7 @@ export function Dashboard() {
 
           <MarketEdge result={state.result} />
 
-          <TeamDetailDrawer result={state.result} />
+          <TeamDetailDrawer result={state.result} resultNoAbsences={state.resultNoAbsences} />
           <MatchDetailDrawer result={state.result} />
         </>
       )}

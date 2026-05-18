@@ -9,7 +9,12 @@ export interface SimState {
   status: SimStatus;
   completed: number;
   total: number;
+  /** Primary result (with absences applied — the model's headline view). */
   result: SerializedResult | null;
+  /** Counterfactual: same seed, same N, but with absences disabled. */
+  resultNoAbsences: SerializedResult | null;
+  /** Which pass is currently running (for progress messaging). */
+  scenario: 'withAbsences' | 'noAbsences' | null;
   durationMs: number | null;
   error: string | null;
 }
@@ -19,6 +24,8 @@ const INITIAL: SimState = {
   completed: 0,
   total: 0,
   result: null,
+  resultNoAbsences: null,
+  scenario: null,
   durationMs: null,
   error: null,
 };
@@ -45,6 +52,8 @@ export function useSimulation() {
       completed: 0,
       total: numSimulations,
       result: null,
+      resultNoAbsences: null,
+      scenario: 'withAbsences',
       durationMs: null,
       error: null,
     });
@@ -52,7 +61,12 @@ export function useSimulation() {
     worker.onmessage = (e: MessageEvent<WorkerOutbound>) => {
       const msg = e.data;
       if (msg.type === 'progress') {
-        setState((s) => ({ ...s, completed: msg.completed, total: msg.total }));
+        setState((s) => ({
+          ...s,
+          completed: msg.completed,
+          total: msg.total,
+          scenario: msg.scenario,
+        }));
       } else if (msg.type === 'done') {
         setState((s) => ({
           ...s,
@@ -60,6 +74,8 @@ export function useSimulation() {
           completed: msg.result.numSimulations,
           total: msg.result.numSimulations,
           result: msg.result,
+          resultNoAbsences: msg.resultNoAbsences,
+          scenario: null,
           durationMs: msg.durationMs,
         }));
       } else if (msg.type === 'error') {

@@ -11,7 +11,7 @@ console.log(`Sim smoke test (n=${N})...`);
 const start = Date.now();
 const champs = new Map<string, number>();
 for (let i = 0; i < N; i++) {
-  const rng = new XoshiroRNG(i + 1, i + 2, i + 3, i + 4);
+  const rng = new XoshiroRNG(i + 1);
   const r = simulateTournament(teams, teamIdx, rng);
   const cid = teams[r.champion].id;
   champs.set(cid, (champs.get(cid) ?? 0) + 1);

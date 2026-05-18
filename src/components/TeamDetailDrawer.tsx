@@ -11,9 +11,13 @@ import { getScorers } from '@/lib/sim/scorers';
 import { TeamAbsencesPanel, AbsenceBadge } from './TeamAbsencesPanel';
 import type { SerializedResult } from '@/lib/sim/worker';
 
-interface Props { result: SerializedResult; }
+interface Props {
+  result: SerializedResult;
+  /** Same Monte Carlo run with the absences penalty disabled — for the counterfactual view. */
+  resultNoAbsences?: SerializedResult | null;
+}
 
-export function TeamDetailDrawer({ result }: Props) {
+export function TeamDetailDrawer({ result, resultNoAbsences }: Props) {
   const locale = useLocale();
   const { selectedTeamId, closeTeam, openFixture } = useSelection();
 
@@ -68,6 +72,23 @@ export function TeamDetailDrawer({ result }: Props) {
     }
     const topScorers = Array.from(myScorers.entries()).sort((a, b) => b[1] - a[1]);
 
+    // Counterfactual stats from the second pass (absences disabled). Same team
+    // index across runs since `teams` is identical in both passes.
+    let noAbs: { wasChamp: number; outInGroups: number; reachFinal: number; reachSF: number } | null = null;
+    if (resultNoAbsences && teamIdx >= 0) {
+      const Nn = resultNoAbsences.numSimulations;
+      const champN = resultNoAbsences.stageCounts.champion[teamIdx];
+      const r32N = resultNoAbsences.stageCounts.r32[teamIdx];
+      const sfN  = resultNoAbsences.stageCounts.sf[teamIdx];
+      const finalN = resultNoAbsences.stageCounts.final[teamIdx];
+      noAbs = {
+        wasChamp: champN / Nn,
+        outInGroups: (Nn - r32N) / Nn,
+        reachSF: sfN / Nn,
+        reachFinal: finalN / Nn,
+      };
+    }
+
     return {
       wasChamp: wasChamp / N,
       wasRunnerUp: wasRunnerUp / N,
@@ -92,8 +113,9 @@ export function TeamDetailDrawer({ result }: Props) {
       topScorers,
       group: findGroup(team.id),
       groupFixtures: findGroupFixtures(team.id, result),
+      noAbs,
     };
-  }, [team, teamIdx, result]);
+  }, [team, teamIdx, result, resultNoAbsences]);
 
   const open = !!selectedTeamId && !!team && !!data;
 
@@ -170,6 +192,47 @@ export function TeamDetailDrawer({ result }: Props) {
 
                 {/* Current absences (injuries / suspensions) */}
                 <TeamAbsencesPanel teamId={team.id} />
+
+                {/* Counterfactual: what if every flagged injury were fake/precautionary */}
+                {data.noAbs && (
+                  <section>
+                    <h3 className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-fg-3">
+                      Escenario sin lesiones{' '}
+                      <span className="text-fg-3">· si todos los flagged jugaran</span>
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      <DeltaCard
+                        label="Probabilidad campeón"
+                        current={data.wasChamp}
+                        alt={data.noAbs.wasChamp}
+                        tone="gold"
+                      />
+                      <DeltaCard
+                        label="Llegar a la final"
+                        current={data.reachFinal}
+                        alt={data.noAbs.reachFinal}
+                        tone="emerald"
+                      />
+                      <DeltaCard
+                        label="Llegar a semis"
+                        current={data.reachSF}
+                        alt={data.noAbs.reachSF}
+                        tone="emerald"
+                      />
+                      <DeltaCard
+                        label="Fuera en grupos"
+                        current={data.outInGroups}
+                        alt={data.noAbs.outInGroups}
+                        tone="rose"
+                      />
+                    </div>
+                    <p className="mt-2 text-[10px] text-fg-3 leading-relaxed">
+                      Muchas lesiones de pre-mundial son precautorias o de manejo de cargas — los clubes
+                      cuidan a los jugadores. Esta vista muestra qué predeciría el modelo si <em>ninguna</em>{' '}
+                      de las lesiones flagged fuera real.
+                    </p>
+                  </section>
+                )}
 
                 {/* Top scorers */}
                 {data.topScorers.length > 0 && (
@@ -317,6 +380,40 @@ function GroupCell({ label, value, tone }: { label: string; value: number; tone:
     <div className="rounded-lg border border-border bg-bg-2/30 p-2">
       <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-fg-3">{label}</div>
       <div className={cn('mt-1 font-mono text-sm tabular', colors[tone])}>{formatPct(value, 0)}</div>
+    </div>
+  );
+}
+
+function DeltaCard({
+  label, current, alt, tone,
+}: {
+  label: string;
+  current: number;
+  alt: number;
+  tone: 'gold' | 'emerald' | 'rose';
+}) {
+  const delta = alt - current;
+  const sign = delta > 0 ? '+' : '';
+  const deltaTone =
+    Math.abs(delta) < 0.005 ? 'text-fg-3' : (delta > 0 ? 'text-emerald' : 'text-rose');
+  const mainColor = {
+    gold: 'text-gold',
+    emerald: 'text-emerald',
+    rose: 'text-rose',
+  }[tone];
+  return (
+    <div className="rounded-xl border border-border bg-bg-2/30 p-3">
+      <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-fg-3">{label}</div>
+      <div className="mt-2 flex items-baseline justify-center gap-2">
+        <span className={cn('font-display text-xl font-bold tabular', mainColor)}>
+          {formatPct(current, 1)}
+        </span>
+        <span className="font-mono text-[10px] text-fg-3">→</span>
+        <span className="font-mono text-sm tabular text-fg-1">{formatPct(alt, 1)}</span>
+      </div>
+      <div className={cn('mt-1 font-mono text-[10px] tabular', deltaTone)}>
+        {sign}{formatPct(delta, 1)}
+      </div>
     </div>
   );
 }

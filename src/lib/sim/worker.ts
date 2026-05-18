@@ -1,14 +1,20 @@
 /// <reference lib="webworker" />
 
 import { runSimulations } from './engine';
+import { setEngineAbsencesEnabled } from './absences';
 import type { AggregateResult, MatchAggregateSerialized } from './types';
 
 export type WorkerInbound =
   | { type: 'run'; numSimulations: number; seed?: number };
 
+/**
+ * Progress messages tag which scenario is currently being computed so the
+ * loading bar can show "Pasada 1/2 — con lesiones · 47%" etc. The `done`
+ * message carries BOTH results.
+ */
 export type WorkerOutbound =
-  | { type: 'progress'; completed: number; total: number }
-  | { type: 'done'; result: SerializedResult; durationMs: number }
+  | { type: 'progress'; completed: number; total: number; scenario: 'withAbsences' | 'noAbsences' }
+  | { type: 'done'; result: SerializedResult; resultNoAbsences: SerializedResult; durationMs: number }
   | { type: 'error'; message: string };
 
 /**
@@ -86,17 +92,40 @@ self.onmessage = (e: MessageEvent<WorkerInbound>) => {
   if (msg.type === 'run') {
     try {
       const t0 = performance.now();
-      const result = runSimulations({
+
+      // Pass 1: with absences (default engine state).
+      setEngineAbsencesEnabled(true);
+      const withAbs = runSimulations({
         numSimulations: msg.numSimulations,
         seed: msg.seed,
         onProgress: (completed, total) => {
-          (self as unknown as Worker).postMessage({ type: 'progress', completed, total } satisfies WorkerOutbound);
+          (self as unknown as Worker).postMessage({
+            type: 'progress', completed, total, scenario: 'withAbsences',
+          } satisfies WorkerOutbound);
         },
       });
+
+      // Pass 2: counterfactual without absences. Same seed so the only delta
+      // comes from the absence penalty — easier to interpret the difference.
+      setEngineAbsencesEnabled(false);
+      const noAbs = runSimulations({
+        numSimulations: msg.numSimulations,
+        seed: msg.seed,
+        onProgress: (completed, total) => {
+          (self as unknown as Worker).postMessage({
+            type: 'progress', completed, total, scenario: 'noAbsences',
+          } satisfies WorkerOutbound);
+        },
+      });
+
+      // Restore default for safety even though the worker terminates.
+      setEngineAbsencesEnabled(true);
+
       const durationMs = performance.now() - t0;
       (self as unknown as Worker).postMessage({
         type: 'done',
-        result: serialize(result),
+        result: serialize(withAbs),
+        resultNoAbsences: serialize(noAbs),
         durationMs,
       } satisfies WorkerOutbound);
     } catch (err) {

@@ -5,6 +5,7 @@ import type { XoshiroRNG } from './rng';
 import {
   currentAbsences,
   teamPenalty,
+  isEngineAbsencesEnabled,
   DEFAULT_ABSENCE_WEIGHTS,
   type Stage,
 } from './absences';
@@ -41,6 +42,7 @@ export function recentFormAdjustment(team: Team): number {
  * calibration sweep result (Tier 1 #4a calibration).
  */
 export function absenceAdjustment(team: Team, stage: Stage = 'group'): number {
+  if (!isEngineAbsencesEnabled()) return 0;
   const list = currentAbsences(team.id);
   if (list.length === 0) return 0;
   return teamPenalty(list, DEFAULT_ABSENCE_WEIGHTS, stage);
