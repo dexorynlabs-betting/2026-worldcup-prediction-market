@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-05-19T12:18:13.471Z",
+    "current_updated_at": "2026-05-20T11:55:01.338Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -194,13 +194,6 @@
     ],
     "CAN": [
       {
-        "player": "Derek Cornelius",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 3,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Richie Laryea",
         "position": "FB",
         "minutes_qual": 0,
@@ -252,6 +245,13 @@
     "CRO": [],
     "CUW": [
       {
+        "player": "Riechedly Bazoer",
+        "position": "CB",
+        "minutes_qual": 0,
+        "market_value_mil": 2.2,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
         "player": "Livano Comenencia",
         "position": "FB",
         "minutes_qual": 0,
@@ -291,13 +291,6 @@
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
-        "player": "Yaimar Medina",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 4,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Gonzalo Plata",
         "position": "WG",
         "minutes_qual": 0,
@@ -310,7 +303,7 @@
         "player": "Islam Issa",
         "position": "WG",
         "minutes_qual": 0,
-        "market_value_mil": 0.6,
+        "market_value_mil": 0.7,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -538,13 +531,6 @@
     ],
     "POR": [
       {
-        "player": "José Sá",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Nuno Mendes",
         "position": "FB",
         "minutes_qual": 0,
@@ -605,6 +591,13 @@
         "position": "FB",
         "minutes_qual": 0,
         "market_value_mil": 12,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Matías Viña",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 4,
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
