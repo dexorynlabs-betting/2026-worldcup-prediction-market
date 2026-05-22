@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-05-21T12:22:49.929Z",
+    "current_updated_at": "2026-05-22T11:51:59.204Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -269,10 +269,17 @@
     ],
     "CZE": [
       {
-        "player": "Martin Vitík",
+        "player": "David Zima",
         "position": "CB",
         "minutes_qual": 0,
-        "market_value_mil": 10,
+        "market_value_mil": 7,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Hugo Sochurek",
+        "position": "CM",
+        "minutes_qual": 0,
+        "market_value_mil": 3.5,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -306,20 +313,6 @@
         "position": "FB",
         "minutes_qual": 0,
         "market_value_mil": 40,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Ben White",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 30,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Jordan Henderson",
-        "position": "DM",
-        "minutes_qual": 0,
-        "market_value_mil": 2,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -391,6 +384,13 @@
     ],
     "IRN": [
       {
+        "player": "Roozbeh Cheshmi",
+        "position": "DM",
+        "minutes_qual": 0,
+        "market_value_mil": 0.45,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
         "player": "Alireza Jahanbakhsh",
         "position": "WG",
         "minutes_qual": 0,
@@ -414,13 +414,6 @@
         "position": "CB",
         "minutes_qual": 0,
         "market_value_mil": 10,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Takehiro Tomiyasu",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 8,
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
@@ -455,15 +448,7 @@
       }
     ],
     "KSA": [],
-    "MAR": [
-      {
-        "player": "Achraf Hakimi",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 80,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "MAR": [],
     "MEX": [],
     "NED": [
       {
