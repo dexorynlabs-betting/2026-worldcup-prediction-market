@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-05-23T10:42:19.743Z",
+    "current_updated_at": "2026-05-24T10:48:11.214Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -174,16 +174,23 @@
         "minutes_qual": 0,
         "market_value_mil": 4.2,
         "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Ivan Sunjic",
+        "position": "DM",
+        "minutes_qual": 0,
+        "market_value_mil": 1.8,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Haris Tabakovic",
+        "position": "ATT",
+        "minutes_qual": 0,
+        "market_value_mil": 3,
+        "reason": "Injured (flagged by transfermarkt)"
       }
     ],
     "BRA": [
-      {
-        "player": "Alisson",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 17,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
       {
         "player": "Neymar",
         "position": "AM",
@@ -210,6 +217,13 @@
     ],
     "CIV": [
       {
+        "player": "Evan Ndicka",
+        "position": "CB",
+        "minutes_qual": 0,
+        "market_value_mil": 35,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
         "player": "Odilon Kossounou",
         "position": "CB",
         "minutes_qual": 0,
@@ -233,6 +247,13 @@
     ],
     "COD": [],
     "COL": [
+      {
+        "player": "Juan Cabal",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 9,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
       {
         "player": "Deiver Machado",
         "position": "FB",
@@ -297,13 +318,6 @@
         "minutes_qual": 0,
         "market_value_mil": 70,
         "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Gonzalo Plata",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 8,
-        "reason": "Injured (flagged by transfermarkt)"
       }
     ],
     "EGY": [],
@@ -329,13 +343,6 @@
         "position": "WG",
         "minutes_qual": 0,
         "market_value_mil": 200,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Ferran Torres",
-        "position": "ATT",
-        "minutes_qual": 0,
-        "market_value_mil": 50,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -417,13 +424,6 @@
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
-        "player": "Wataru Endo",
-        "position": "DM",
-        "minutes_qual": 0,
-        "market_value_mil": 5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Yuito Suzuki",
         "position": "AM",
         "minutes_qual": 0,
@@ -432,13 +432,6 @@
       }
     ],
     "KOR": [
-      {
-        "player": "Min-jae Kim",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 25,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
       {
         "player": "In-beom Hwang",
         "position": "DM",
@@ -451,13 +444,6 @@
     "MAR": [],
     "MEX": [],
     "NED": [
-      {
-        "player": "Jeremie Frimpong",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 35,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
       {
         "player": "Jerdy Schouten",
         "position": "DM",
@@ -473,7 +459,15 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "NOR": [],
+    "NOR": [
+      {
+        "player": "Leo Østigård",
+        "position": "CB",
+        "minutes_qual": 0,
+        "market_value_mil": 10,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "NZL": [
       {
         "player": "Tyler Bindon",
@@ -559,18 +553,25 @@
       }
     ],
     "SUI": [],
-    "SWE": [
+    "SWE": [],
+    "TUN": [],
+    "TUR": [
       {
-        "player": "Alexander Isak",
-        "position": "ATT",
+        "player": "Kenan Yıldız",
+        "position": "WG",
         "minutes_qual": 0,
-        "market_value_mil": 100,
+        "market_value_mil": 75,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "TUN": [],
-    "TUR": [],
     "URU": [
+      {
+        "player": "Sergio Rochet",
+        "position": "GK",
+        "minutes_qual": 0,
+        "market_value_mil": 2,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
       {
         "player": "Sebastián Cáceres",
         "position": "CB",
@@ -589,7 +590,7 @@
         "player": "Matías Viña",
         "position": "FB",
         "minutes_qual": 0,
-        "market_value_mil": 4,
+        "market_value_mil": 3.5,
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
