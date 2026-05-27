@@ -87,13 +87,13 @@ export function GoalStats({ result }: Props) {
     const gradId = 'goalGrad';
     const defs = d3.select(svg).append('defs');
     const grad = defs.append('linearGradient').attr('id', gradId).attr('x1', '0').attr('x2', '0').attr('y1', '0').attr('y2', '1');
-    grad.append('stop').attr('offset', '0%').attr('stop-color', 'oklch(0.66 0.10 180)').attr('stop-opacity', 0.85);
-    grad.append('stop').attr('offset', '100%').attr('stop-color', 'oklch(0.66 0.10 180)').attr('stop-opacity', 0.05);
+    grad.append('stop').attr('offset', '0%').attr('stop-color', 'oklch(0.76 0.13 180)').attr('stop-opacity', 0.85);
+    grad.append('stop').attr('offset', '100%').attr('stop-color', 'oklch(0.76 0.13 180)').attr('stop-opacity', 0.05);
 
     g.append('path')
       .datum(data)
       .attr('fill', `url(#${gradId})`)
-      .attr('stroke', 'oklch(0.66 0.10 180)')
+      .attr('stroke', 'oklch(0.76 0.13 180)')
       .attr('stroke-width', 1.5)
       .attr('d', area);
 
@@ -157,7 +157,7 @@ export function GoalStats({ result }: Props) {
                     className="h-full rounded-full"
                     style={{
                       width: `${(s.avgGF / maxGF) * 100}%`,
-                      background: 'linear-gradient(90deg, oklch(0.52 0.08 180), oklch(0.66 0.10 180))',
+                      background: 'linear-gradient(90deg, oklch(0.60 0.10 180), oklch(0.76 0.13 180))',
                     }}
                   />
                 </div>

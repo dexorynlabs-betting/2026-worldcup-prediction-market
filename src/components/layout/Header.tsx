@@ -24,6 +24,23 @@ export function Header() {
     router.replace(pathname, { locale: to });
   };
 
+  const navLink = (href: string, label: string) => {
+    const path = href.split('#')[0] || '/';
+    const active = path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(`${path}/`);
+
+    return (
+      <Link
+        href={href}
+        className={cn(
+          'font-medium transition-colors',
+          active ? 'text-gold' : 'text-fg-0/85 hover:text-gold',
+        )}
+      >
+        {label}
+      </Link>
+    );
+  };
+
   return (
     <header
       className={cn(
@@ -41,20 +58,24 @@ export function Header() {
       >
         <Link href="/" className="flex items-center gap-2.5 group">
           <Image
-            src="/logo.jpg"
-            alt="Outliners"
-            width={28}
-            height={28}
+            src="/logo-worldcup2026.webp"
+            alt="FIFA World Cup 2026"
+            width={250}
+            height={386}
             priority
-            className="rounded-md ring-1 ring-gold/30 transition-transform group-hover:scale-110"
+            className={cn(
+              'w-auto object-contain transition-transform group-hover:scale-105',
+              scrolled ? 'h-7' : 'h-9',
+            )}
           />
           <span className="text-sm font-medium tracking-wide text-fg-0">{t('brand')}</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7 text-sm text-fg-2">
-          <Link href="/#simulate" className="hover:text-fg-0 transition-colors">{t('nav_simulate')}</Link>
-          <Link href="/backtest" className="hover:text-fg-0 transition-colors">Backtest</Link>
-          <Link href="/methodology" className="hover:text-fg-0 transition-colors">{t('nav_methodology')}</Link>
+        <nav className="hidden md:flex items-center gap-7 text-sm">
+          {navLink('/#simulate', t('nav_simulate'))}
+          {navLink('/backtest', 'Backtest')}
+          {navLink('/demo', t('nav_demo'))}
+          {navLink('/methodology', t('nav_methodology'))}
         </nav>
 
         <div className="flex items-center gap-1 rounded-full border border-border bg-bg-1/40 p-0.5">
@@ -62,7 +83,7 @@ export function Header() {
             onClick={() => switchLocale('es')}
             className={cn(
               'px-3 py-1 text-xs font-medium rounded-full transition-colors',
-              locale === 'es' ? 'bg-gold/90 text-bg-0' : 'text-fg-2 hover:text-fg-0',
+              locale === 'es' ? 'bg-gold text-bg-0' : 'text-fg-0/80 hover:text-fg-0',
             )}
             aria-label="Español"
           >
@@ -72,7 +93,7 @@ export function Header() {
             onClick={() => switchLocale('en')}
             className={cn(
               'px-3 py-1 text-xs font-medium rounded-full transition-colors',
-              locale === 'en' ? 'bg-gold/90 text-bg-0' : 'text-fg-2 hover:text-fg-0',
+              locale === 'en' ? 'bg-gold text-bg-0' : 'text-fg-0/80 hover:text-fg-0',
             )}
             aria-label="English"
           >

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { Flag } from './Flag';
 import { cn, formatPct, wilsonCI, formatCIHalf } from '@/lib/utils';
@@ -16,6 +16,7 @@ interface Props {
 
 export function ChampionProbBar({ result, resultNoAbsences }: Props) {
   const t = useTranslations('champion');
+  const locale = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const openTeam = useSelection((s) => s.openTeam);
   const [mode, setMode] = useState<'with' | 'without'>('with');
@@ -48,19 +49,24 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
   useEffect(() => {
     if (!containerRef.current) return;
     const bars = containerRef.current.querySelectorAll('[data-bar]');
-    gsap.fromTo(
-      bars,
-      { scaleX: 0, opacity: 0 },
-      {
-        scaleX: 1,
-        opacity: 1,
-        stagger: 0.05,
-        duration: 0.9,
-        ease: 'expo.out',
-        transformOrigin: 'left',
-      },
-    );
-  }, [active]);
+    if (!bars.length) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        bars,
+        { scaleX: 0, opacity: 0 },
+        {
+          scaleX: 1,
+          opacity: 1,
+          stagger: 0.05,
+          duration: 0.9,
+          ease: 'expo.out',
+          transformOrigin: 'left',
+        },
+      );
+    }, containerRef);
+    return () => ctx.revert();
+  }, [active, locale]);
 
   return (
     <section id="champion" className="mx-auto max-w-[1280px] px-6 py-20">
@@ -84,7 +90,7 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
                   : 'text-fg-3 hover:text-fg-1',
               )}
             >
-              Con lesiones
+              {t('mode_with')}
             </button>
             <button
               onClick={() => setMode('without')}
@@ -95,7 +101,7 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
                   : 'text-fg-3 hover:text-fg-1',
               )}
             >
-              Sin lesiones
+              {t('mode_without')}
             </button>
           </div>
         )}
@@ -118,7 +124,7 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
                 className="pointer-events-none absolute inset-0 -z-10 rounded-xl opacity-60"
                 style={{
                   background:
-                    'conic-gradient(from var(--angle, 0deg), transparent 0deg, oklch(0.66 0.10 180 / 0.45) 90deg, transparent 180deg, oklch(0.52 0.08 180 / 0.3) 270deg, transparent 360deg)',
+                    'conic-gradient(from var(--angle, 0deg), transparent 0deg, oklch(0.76 0.13 180 / 0.45) 90deg, transparent 180deg, oklch(0.60 0.10 180 / 0.3) 270deg, transparent 360deg)',
                   filter: 'blur(20px)',
                   animation: 'spin-slow 10s linear infinite',
                 }}
@@ -128,7 +134,9 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
             <span className="w-6 text-right font-mono text-xs text-fg-3 tabular">{i + 1}</span>
             <div className="flex items-center gap-2 min-w-0">
               <Flag code={r.team.flag} size={26} />
-              <span className="truncate font-medium text-fg-0">{r.team.name_es}</span>
+              <span className="truncate font-medium text-fg-0">
+                {locale === 'es' ? r.team.name_es : r.team.name_en}
+              </span>
             </div>
             <div className="relative h-6 overflow-hidden rounded-full bg-bg-2/60">
               <div
@@ -138,9 +146,9 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
                   width: `${(r.pct / max) * 100}%`,
                   background:
                     i === 0
-                      ? 'linear-gradient(90deg, oklch(0.66 0.10 180) 0%, oklch(0.78 0.09 180) 100%)'
-                      : 'linear-gradient(90deg, oklch(0.52 0.08 180 / 0.85) 0%, oklch(0.66 0.10 180 / 0.85) 100%)',
-                  boxShadow: i === 0 ? '0 0 24px -4px oklch(0.66 0.10 180 / 0.65)' : 'none',
+                      ? 'linear-gradient(90deg, oklch(0.76 0.13 180) 0%, oklch(0.88 0.11 180) 100%)'
+                      : 'linear-gradient(90deg, oklch(0.60 0.10 180 / 0.85) 0%, oklch(0.76 0.13 180 / 0.85) 100%)',
+                  boxShadow: i === 0 ? '0 0 24px -4px oklch(0.76 0.13 180 / 0.65)' : 'none',
                 }}
               />
             </div>
@@ -152,7 +160,7 @@ export function ChampionProbBar({ result, resultNoAbsences }: Props) {
             </div>
 
             {i === 0 && (
-              <span className="absolute -top-2 right-3 rounded-full bg-gold px-2 py-0.5 font-mono text-[9px] font-bold tracking-[0.15em] text-bg-0 shadow-[0_4px_16px_-4px_oklch(0.66_0.10_180/0.8)]">
+              <span className="absolute -top-2 right-3 rounded-full bg-gold px-2 py-0.5 font-mono text-[9px] font-bold tracking-[0.15em] text-bg-0 shadow-[0_4px_16px_-4px_oklch(0.76_0.13_180/0.8)]">
                 {t('most_likely')}
               </span>
             )}

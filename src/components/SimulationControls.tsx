@@ -48,7 +48,7 @@ export function SimulationControls({ state, onRun }: Props) {
                 active
                   ? 'border-gold/60 bg-gold/15 text-gold shadow-[0_0_24px_-8px_oklch(0.80_0.18_75/0.6)]'
                   : 'border-border bg-bg-1/40 text-fg-2 hover:border-border-strong hover:text-fg-1',
-                isRunning && 'cursor-not-allowed opacity-50',
+                isRunning && 'opacity-50',
               )}
             >
               {n >= 1000 ? `${n / 1000}K` : n}
@@ -69,7 +69,7 @@ export function SimulationControls({ state, onRun }: Props) {
             height: '420%',
             transform: 'translate(-50%, -50%)',
             background:
-              'radial-gradient(ellipse 50% 35% at 50% 50%, oklch(0.66 0.10 180 / 0.55), oklch(0.66 0.10 180 / 0.15) 35%, transparent 65%)',
+              'radial-gradient(ellipse 50% 35% at 50% 50%, oklch(0.76 0.13 180 / 0.55), oklch(0.76 0.13 180 / 0.15) 35%, transparent 65%)',
             filter: 'blur(28px)',
           }}
         />
@@ -83,7 +83,7 @@ export function SimulationControls({ state, onRun }: Props) {
           'bg-gradient-to-b from-gold to-gold-lo text-bg-0',
           'shadow-[0_1px_0_0_oklch(1_0_0/0.35)_inset]',
           'hover:scale-[1.02] active:scale-[0.99]',
-          isRunning && 'cursor-default hover:scale-100',
+          isRunning && 'hover:scale-100',
         )}
       >
         {/* Progress fill */}

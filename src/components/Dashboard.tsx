@@ -76,8 +76,8 @@ export function Dashboard() {
 
 function fireConfetti() {
   const colors = [
-    'oklch(0.66 0.10 180)',
-    'oklch(0.78 0.09 180)',
+    'oklch(0.76 0.13 180)',
+    'oklch(0.88 0.11 180)',
     'oklch(0.72 0.17 155)',
     'oklch(0.65 0.20 295)',
     'oklch(0.97 0.005 260)',

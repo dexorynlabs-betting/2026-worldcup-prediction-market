@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import type { SerializedResult, WorkerOutbound } from '@/lib/sim/worker';
 
 export type SimStatus = 'idle' | 'running' | 'done' | 'error';
@@ -30,24 +30,69 @@ const INITIAL: SimState = {
   error: null,
 };
 
+/** Survives locale navigation so results stay visible after ES ↔ EN switch. */
+let sharedState: SimState = INITIAL;
+let sharedWorker: Worker | null = null;
+
+function commitState(setState: Dispatch<SetStateAction<SimState>>, next: SimState) {
+  sharedState = next;
+  setState(next);
+}
+
+function patchState(setState: Dispatch<SetStateAction<SimState>>, patch: Partial<SimState>) {
+  setState((prev) => {
+    const next = { ...prev, ...patch };
+    sharedState = next;
+    return next;
+  });
+}
+
+function attachWorkerHandlers(
+  worker: Worker,
+  setState: Dispatch<SetStateAction<SimState>>,
+) {
+  worker.onmessage = (e: MessageEvent<WorkerOutbound>) => {
+    const msg = e.data;
+    if (msg.type === 'progress') {
+      patchState(setState, {
+        completed: msg.completed,
+        total: msg.total,
+        scenario: msg.scenario,
+      });
+    } else if (msg.type === 'done') {
+      patchState(setState, {
+        status: 'done',
+        completed: msg.result.numSimulations,
+        total: msg.result.numSimulations,
+        result: msg.result,
+        resultNoAbsences: msg.resultNoAbsences,
+        scenario: null,
+        durationMs: msg.durationMs,
+      });
+    } else if (msg.type === 'error') {
+      patchState(setState, { status: 'error', error: msg.message });
+    }
+  };
+}
+
 export function useSimulation() {
-  const workerRef = useRef<Worker | null>(null);
-  const [state, setState] = useState<SimState>(INITIAL);
+  const workerRef = useRef<Worker | null>(sharedWorker);
+  const [state, setState] = useState<SimState>(() => sharedState);
 
   useEffect(() => {
-    return () => {
-      workerRef.current?.terminate();
-      workerRef.current = null;
-    };
+    if (sharedWorker && sharedState.status === 'running') {
+      workerRef.current = sharedWorker;
+      attachWorkerHandlers(sharedWorker, setState);
+    }
   }, []);
 
   const run = useCallback((numSimulations: number, seed?: number) => {
-    // Re-create worker each run to avoid state bleed.
-    workerRef.current?.terminate();
+    sharedWorker?.terminate();
     const worker = new Worker(new URL('@/lib/sim/worker.ts', import.meta.url), { type: 'module' });
+    sharedWorker = worker;
     workerRef.current = worker;
 
-    setState({
+    commitState(setState, {
       status: 'running',
       completed: 0,
       total: numSimulations,
@@ -58,38 +103,15 @@ export function useSimulation() {
       error: null,
     });
 
-    worker.onmessage = (e: MessageEvent<WorkerOutbound>) => {
-      const msg = e.data;
-      if (msg.type === 'progress') {
-        setState((s) => ({
-          ...s,
-          completed: msg.completed,
-          total: msg.total,
-          scenario: msg.scenario,
-        }));
-      } else if (msg.type === 'done') {
-        setState((s) => ({
-          ...s,
-          status: 'done',
-          completed: msg.result.numSimulations,
-          total: msg.result.numSimulations,
-          result: msg.result,
-          resultNoAbsences: msg.resultNoAbsences,
-          scenario: null,
-          durationMs: msg.durationMs,
-        }));
-      } else if (msg.type === 'error') {
-        setState((s) => ({ ...s, status: 'error', error: msg.message }));
-      }
-    };
-
+    attachWorkerHandlers(worker, setState);
     worker.postMessage({ type: 'run', numSimulations, seed });
   }, []);
 
   const reset = useCallback(() => {
-    workerRef.current?.terminate();
+    sharedWorker?.terminate();
+    sharedWorker = null;
     workerRef.current = null;
-    setState(INITIAL);
+    commitState(setState, INITIAL);
   }, []);
 
   return { state, run, reset };

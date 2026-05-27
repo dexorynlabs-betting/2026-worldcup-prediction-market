@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 export function Footer() {
   const t = useTranslations('footer');
   return (
-    <footer className="relative z-10 mt-32 border-t border-border py-12">
+    <footer className="relative z-10 mt-4 border-t border-border py-6 sm:mt-6">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
       <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-fg-2">{t('credits')}</p>

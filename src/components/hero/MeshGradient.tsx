@@ -34,7 +34,7 @@ export function MeshGradient() {
       <div
         className="absolute top-[10%] left-[5%] h-[640px] w-[640px] rounded-full opacity-50 blur-[120px] motion-safe:animate-[drift1_22s_ease-in-out_infinite]"
         style={{
-          background: 'radial-gradient(circle at 50% 50%, oklch(0.66 0.10 180 / 0.55), transparent 65%)',
+          background: 'radial-gradient(circle at 50% 50%, oklch(0.76 0.13 180 / 0.55), transparent 65%)',
           transform: 'translate(var(--mx, 0px), var(--my, 0px))',
         }}
       />

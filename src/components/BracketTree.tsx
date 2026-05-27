@@ -41,12 +41,17 @@ export function BracketTree({ result }: Props) {
   useEffect(() => {
     if (!containerRef.current) return;
     const cards = containerRef.current.querySelectorAll('[data-card]');
-    gsap.fromTo(
-      cards,
-      { y: 16, opacity: 0 },
-      { y: 0, opacity: 1, stagger: 0.03, duration: 0.5, ease: 'expo.out' },
-    );
-  }, [result]);
+    if (!cards.length) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        cards,
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.03, duration: 0.5, ease: 'expo.out' },
+      );
+    }, containerRef);
+    return () => ctx.revert();
+  }, [result, locale]);
 
   const stages = [
     { key: 'r32',   label: 'R32',      rows: data.r32 },

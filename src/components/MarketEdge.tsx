@@ -85,7 +85,7 @@ export function MarketEdge({ result }: Props) {
   const sources = file?._meta.sources || [];
 
   return (
-    <section id="mercado" className="mx-auto max-w-[1280px] px-6 py-20 scroll-mt-24">
+    <section id="mercado" className="mx-auto max-w-[1280px] scroll-mt-24 px-6 pt-20 pb-10">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="font-display text-4xl font-bold tracking-tight text-fg-0 sm:text-5xl">

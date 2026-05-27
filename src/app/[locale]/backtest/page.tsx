@@ -18,7 +18,7 @@ export default async function BacktestPage({ params }: { params: Promise<{ local
   const penEval = runPenaltyEvaluation();
 
   return (
-    <article className="relative mx-auto max-w-[1100px] px-6 pt-32 pb-32">
+    <article className="relative mx-auto max-w-[1100px] px-6 pt-32 pb-14">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.18em] text-fg-3 transition-colors hover:text-fg-1"
@@ -390,7 +390,7 @@ function RecentFormHeatmap({ cells }: { cells: RecentFormSweepCell[] }) {
   // Color scale: lower = better (emerald), higher = worse (rose).
   const cellAt = (alpha: number, lb: number) => cells.find((c) => c.alpha === alpha && c.lookbackYears === lb)!;
   const colorFor = (b: number) => {
-    if (maxBrier === minBrier) return 'oklch(0.52 0.08 180 / 0.3)';
+    if (maxBrier === minBrier) return 'oklch(0.60 0.10 180 / 0.3)';
     const t = (b - minBrier) / (maxBrier - minBrier);  // 0 = best, 1 = worst
     // Interpolate hue from emerald (155) → rose (18), lightness boost on extremes
     if (t < 0.5) {
@@ -499,9 +499,9 @@ function SweepChart({ points }: { points: SweepPoint[] }) {
         <text x={14} y={(H - PAD_B + PAD_T) / 2} fontSize={11} fontFamily="JetBrains Mono, monospace" fill="oklch(0.46 0.02 180)" textAnchor="middle" transform={`rotate(-90 14 ${(H - PAD_B + PAD_T) / 2})`}>Brier (host-only, n=28)</text>
 
         {/* group-only line (default behavior) */}
-        <path d={path(series.groupOnly)} stroke="oklch(0.66 0.10 180)" strokeWidth={2} fill="none" />
+        <path d={path(series.groupOnly)} stroke="oklch(0.76 0.13 180)" strokeWidth={2} fill="none" />
         {series.groupOnly.map((p) => (
-          <circle key={`g-${p.hostBonus}`} cx={x(p.hostBonus)} cy={y(p.hostOnly.brier)} r={3.5} fill="oklch(0.66 0.10 180)" />
+          <circle key={`g-${p.hostBonus}`} cx={x(p.hostBonus)} cy={y(p.hostOnly.brier)} r={3.5} fill="oklch(0.76 0.13 180)" />
         ))}
         {/* plus-KO line */}
         <path d={path(series.plusKO)} stroke="oklch(0.65 0.22 18)" strokeWidth={2} fill="none" strokeDasharray="4 3" />
@@ -548,7 +548,7 @@ function CalibrationPlot({ buckets }: { buckets: CalibrationBucket[] }) {
           const r = Math.max(3, Math.min(12, Math.sqrt(b.count) * 0.6));
           return (
             <g key={i}>
-              <circle cx={x(b.predicted)} cy={y(b.observed)} r={r} fill="oklch(0.66 0.10 180 / 0.7)" stroke="oklch(0.66 0.10 180)" strokeWidth={1} />
+              <circle cx={x(b.predicted)} cy={y(b.observed)} r={r} fill="oklch(0.76 0.13 180 / 0.7)" stroke="oklch(0.76 0.13 180)" strokeWidth={1} />
             </g>
           );
         })}

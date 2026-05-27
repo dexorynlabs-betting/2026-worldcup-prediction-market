@@ -7,7 +7,8 @@
  *   #042320  surface 2     card body
  *   #02403b  surface 3     border / divider
  *   #027268  brand dark    dark teal
- *   #25a091  brand mid     primary accent (replaces previous "gold")
+ *   #25a091  brand mid     (previous primary — muted)
+ *   #45e0cc  brand bright  primary accent (lifted for UI contrast on dark bg)
  *
  * The legacy --color-gold token is preserved as an ALIAS to the brand teal so
  * existing `text-gold` etc. classes keep working but render in Outliners teal.
@@ -26,9 +27,9 @@
 
   /* Brand teal (replaces "gold" as the primary accent). Token name kept for
      compatibility with existing components. */
-  --color-gold: oklch(0.66 0.10 180);     /* #25a091 brand mid */
-  --color-gold-hi: oklch(0.78 0.09 180);  /* lighter teal */
-  --color-gold-lo: oklch(0.52 0.08 180);  /* #027268 brand dark */
+  --color-gold: oklch(0.76 0.13 180);     /* ~#45e0cc bright teal */
+  --color-gold-hi: oklch(0.88 0.11 180);  /* lighter teal */
+  --color-gold-lo: oklch(0.60 0.10 180);  /* dark teal for gradients */
 
   --color-emerald: oklch(0.72 0.17 155);
   --color-emerald-lo: oklch(0.55 0.18 155);
@@ -45,7 +46,7 @@
   --font-display: "Montserrat", "Geist Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
 
-  --shadow-glow-gold: 0 20px 60px -12px oklch(0.66 0.10 180 / 0.45);
+  --shadow-glow-gold: 0 20px 60px -12px oklch(0.76 0.13 180 / 0.50);
   --shadow-card: 0 1px 0 0 oklch(1 0 0 / 0.05) inset, 0 24px 64px -16px oklch(0 0 0 / 0.6);
   --shadow-card-hover: 0 1px 0 0 oklch(1 0 0 / 0.08) inset, 0 32px 80px -16px oklch(0 0 0 / 0.7);
 
@@ -68,9 +69,30 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   background-image:
-    radial-gradient(ellipse 110% 60% at 50% -10%, oklch(0.66 0.10 180 / 0.10), transparent 70%),
-    radial-gradient(ellipse 80% 50% at 85% 15%, oklch(0.52 0.08 180 / 0.08), transparent 70%);
+    radial-gradient(ellipse 110% 60% at 50% -10%, oklch(0.76 0.13 180 / 0.12), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 85% 15%, oklch(0.60 0.10 180 / 0.09), transparent 70%);
   background-attachment: fixed;
+}
+
+button:not(:disabled),
+[type="button"]:not(:disabled),
+[type="submit"]:not(:disabled),
+[type="reset"]:not(:disabled),
+label[for],
+select,
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="submit"]:disabled,
+[type="reset"]:disabled {
+  cursor: not-allowed;
+}
+
+a[href] {
+  cursor: pointer;
 }
 
 /* SVG turbulence noise overlay — pinned to body, very subtle */
@@ -94,7 +116,7 @@ body::before {
 
 /* Selection */
 ::selection {
-  background: oklch(0.66 0.10 180 / 0.35);
+  background: oklch(0.76 0.13 180 / 0.35);
   color: var(--color-fg-0);
 }
 

@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { PageBackground } from '@/components/layout/PageBackground';
 import '../globals.css';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' });
@@ -41,6 +42,7 @@ export default async function LocaleLayout({
     <html lang={locale} className={`${geist.variable} ${display.variable} ${mono.variable}`}>
       <body className="min-h-screen bg-bg-0 text-fg-1 antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <PageBackground />
           <Header />
           <main className="relative z-10">{children}</main>
           <Footer />

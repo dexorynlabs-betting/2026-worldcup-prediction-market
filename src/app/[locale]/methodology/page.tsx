@@ -8,7 +8,7 @@ export default async function MethodologyPage({ params }: { params: Promise<{ lo
   const t = await getTranslations('methodology');
 
   return (
-    <article className="relative mx-auto max-w-3xl px-6 pt-32 pb-32">
+    <article className="relative mx-auto max-w-3xl px-6 pt-32 pb-14">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.18em] text-fg-3 transition-colors hover:text-fg-1"

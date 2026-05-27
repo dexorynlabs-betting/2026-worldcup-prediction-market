@@ -17,7 +17,7 @@ export function TrophySigil() {
         className="absolute inset-0 rounded-full blur-3xl opacity-60"
         style={{
           background:
-            'radial-gradient(circle at 50% 50%, oklch(0.66 0.10 180 / 0.35), transparent 60%)',
+            'radial-gradient(circle at 50% 50%, oklch(0.76 0.13 180 / 0.35), transparent 60%)',
         }}
       />
 
@@ -26,7 +26,7 @@ export function TrophySigil() {
         className="absolute inset-0 rounded-full motion-safe:animate-[spin-slow_22s_linear_infinite]"
         style={{
           background:
-            'conic-gradient(from 0deg, transparent 0deg, oklch(0.66 0.10 180 / 0.55) 60deg, transparent 120deg, transparent 240deg, oklch(0.52 0.08 180 / 0.4) 300deg, transparent 360deg)',
+            'conic-gradient(from 0deg, transparent 0deg, oklch(0.76 0.13 180 / 0.55) 60deg, transparent 120deg, transparent 240deg, oklch(0.60 0.10 180 / 0.4) 300deg, transparent 360deg)',
           mask: 'radial-gradient(circle, transparent 60%, black 61%, black 64%, transparent 65%)',
           WebkitMask: 'radial-gradient(circle, transparent 60%, black 61%, black 64%, transparent 65%)',
         }}
@@ -75,7 +75,7 @@ export function TrophySigil() {
         <defs>
           <linearGradient id="trophyFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="oklch(0.85 0.09 180)" />
-            <stop offset="50%" stopColor="oklch(0.66 0.10 180)" />
+            <stop offset="50%" stopColor="oklch(0.76 0.13 180)" />
             <stop offset="100%" stopColor="oklch(0.42 0.07 180)" />
           </linearGradient>
           <linearGradient id="trophyStroke" x1="0" y1="0" x2="0" y2="1">
