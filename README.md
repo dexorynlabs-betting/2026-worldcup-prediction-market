@@ -1,13 +1,29 @@
 # Outliners · World Cup 2026 Analytics
 
-Monte Carlo simulator and interactive analytics for the **FIFA World Cup 2026** — ELO + Poisson engine, injury-adjusted squads, prediction-market demo, and bookmaker edge analysis. Built by [Outliners](https://outliners.dev) for books, traders, and media.
+## Contact
 
-![FIFA World Cup 2026 — trophy celebration](public/worldcup1.jpg)
+**Built by [Dexorynlabs](https://t.me/dexoryn777)** · Developer: **Dexoryn**
+
+| | |
+|---|---|
+| **Telegram** | [@dexoryn777](https://t.me/dexoryn777) |
+| **X (Twitter)** | [@dexoryn](https://x.com/dexoryn) |
+
+Questions about this demo, the simulator, or integrating similar analytics for your product? Reach out on Telegram or X.
+
+**Live demo:** [worldcup2026-prediction-market.vercel.app](https://worldcup2026-prediction-market.vercel.app/) · English (default) · Spanish [`/es`](https://worldcup2026-prediction-market.vercel.app/es)
+
+---
+
+Monte Carlo simulator and interactive analytics for the **FIFA World Cup 2026** — ELO + Poisson engine, injury-adjusted squads, prediction-market demo, and bookmaker edge analysis.
+
+![FIFA World Cup 2026 Analytics](public/banner.png)
 
 > *Inspired by [I Simulated the World Cup, and the US won*](https://www.youtube.com/watch?v=w5NK7bPjQkw) — same core idea, extended with absences, penalties, markets demo, and historical backtests.*
 
-**Live app:** run locally with `npm run dev` → [http://localhost:3000](http://localhost:3000)  
-**Languages:** Spanish (default) · English (`/en`)
+**Live app:** [worldcup2026-prediction-market.vercel.app](https://worldcup2026-prediction-market.vercel.app/)  
+**Run locally:** `npm run dev` → [http://localhost:3000](http://localhost:3000)  
+**Languages:** English (default) · Spanish (`/es`)
 
 ---
 
@@ -27,7 +43,7 @@ Monte Carlo simulator and interactive analytics for the **FIFA World Cup 2026** 
   - **Tournament & goal stats**, **surprise teams**, **market edge vs Polymarket/Kalshi**
 - **Team & match drawers** — ELO, absences, stage probabilities, score heatmaps, scorers
 - **Sticky section nav**, confetti on sim completion, hero image gallery
-- **Mobile responsive** layout with hamburger nav and scroll-friendly tables
+- **Mobile responsive** — hamburger nav, scroll-friendly tables, stacked demo layouts
 
 ### Prediction markets demo (`/demo`)
 
@@ -51,6 +67,12 @@ Historical validation on **World Cups 2014, 2018, 2022** — calibration buckets
 ### Methodology (`/methodology`)
 
 Full write-up of ELO expectancy, Poisson goals, knockout penalties (Bayesian shrinkage on 103 historical shoot-outs), Monte Carlo aggregation, Wilson CIs, and known limitations.
+
+### UI highlights
+
+- Hero: **“Who will win the 2026 World Cup?”** with live sim controls
+- Header **developer contact card** (Dexoryn · Telegram · X) on every page
+- Footer credits + **Made by Dexorynlabs** with social links
 
 ---
 
@@ -124,7 +146,7 @@ Key players out (injury/suspension) apply an ELO penalty per squad before each t
 - Average goals per match ≈ **2.6** (in line with WC history 2.5–2.7)
 - Top contenders align with ELO / bookmaker consensus (Spain, Argentina, France, Brazil, Portugal)
 
-See [`/methodology`](http://localhost:3000/methodology) in the app for the full spec.
+See `/methodology` in the app for the full spec.
 
 ---
 
@@ -141,7 +163,7 @@ src/
 ├── components/
 │   ├── demo/               DemoHub · MarketsTab · TicketsTab · PortfolioTab
 │   ├── hero/               HeroGallery · HeroDemoPromo · MeshGradient
-│   ├── layout/             Header · Footer · SectionNav
+│   ├── layout/             Header · HeaderProfile · Footer · SectionNav
 │   └── …                   Dashboard widgets + drawers
 ├── hooks/
 │   ├── useSimulation.ts    Shared Web Worker + sim state (survives navigation)
@@ -150,12 +172,15 @@ src/
 ├── lib/
 │   ├── sim/                engine · tournament · group · knockout · absences · worker
 │   ├── demo/               markets · tickets · cache · flags
+│   ├── social.ts           Telegram & X URLs (header + footer)
 │   └── confetti.ts         Shared celebration effect
 ├── data/                   teams.json · groups.json · bracket.json · absences · odds
 └── scripts/                ELO scrape · odds fetch · backtest data · eval sweeps
 
 public/
-├── worldcup1.jpg           Hero trophy image (also shown above)
+├── banner.png              README banner
+├── worldcup1.jpg           Hero trophy image
+├── Dexoryn.png             Developer avatar (header contact card)
 ├── logo-worldcup2026.webp
 └── …                       Gallery & brand assets
 ```
@@ -164,23 +189,30 @@ public/
 
 ## Routes
 
-| Path | Description |
-|------|-------------|
-| `/` | Simulate → dashboard |
-| `/demo` | Play-money markets & tickets |
-| `/backtest` | 2014 / 2018 / 2022 validation |
-| `/methodology` | Model docs |
-| `/en/…` | English locale prefix |
+**Production base:** [https://worldcup2026-prediction-market.vercel.app](https://worldcup2026-prediction-market.vercel.app)
+
+| Path | Description | Live |
+|------|-------------|------|
+| `/` | Simulate → dashboard (EN) | [Open](https://worldcup2026-prediction-market.vercel.app/) |
+| `/es` | Home (ES) | [Open](https://worldcup2026-prediction-market.vercel.app/es) |
+| `/demo` | Play-money markets & tickets | [Open](https://worldcup2026-prediction-market.vercel.app/demo) |
+| `/backtest` | 2014 / 2018 / 2022 validation | [Open](https://worldcup2026-prediction-market.vercel.app/backtest) |
+| `/methodology` | Model docs | [Open](https://worldcup2026-prediction-market.vercel.app/methodology) |
+| `/es/…` | Spanish locale prefix | e.g. [/es/demo](https://worldcup2026-prediction-market.vercel.app/es/demo) |
 
 ---
 
-## Credits
+## Credits & contact
 
-- **ELO ratings:** [eloratings.net](https://www.eloratings.net/)
-- **Official draw:** [FIFA World Cup 2026](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026)
-- **Reference methodology:** [Luke Benz — World Cup simulation](https://www.youtube.com/watch?v=w5NK7bPjQkw)
-- **Flags:** [circle-flags](https://hatscripts.github.io/circle-flags/) (MIT)
-- **Built by:** Outliners · Sports quant analytics
+| | |
+|---|---|
+| **Developer** | **Dexoryn** · [Dexorynlabs](https://t.me/dexoryn777) |
+| **Telegram** | [@dexoryn777](https://t.me/dexoryn777) |
+| **X** | [@dexoryn](https://x.com/dexoryn) |
+| **ELO ratings** | [eloratings.net](https://www.eloratings.net/) |
+| **Official draw** | [FIFA World Cup 2026](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026) |
+| **Reference methodology** | [Luke Benz — World Cup simulation](https://www.youtube.com/watch?v=w5NK7bPjQkw) |
+| **Flags** | [circle-flags](https://hatscripts.github.io/circle-flags/) (MIT) |
 
 ---
 
