@@ -39,6 +39,14 @@
     "progress": "{done} / {total}",
     "eta_seconds": "{seconds}s remaining"
   },
+  "countdown": {
+    "until_open": "until kickoff",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "min",
+    "seconds": "sec",
+    "aria_label": "Countdown to World Cup 2026 kickoff"
+  },
   "gallery": {
     "trophy": "The Trophy",
     "trophy_eyebrow": "FIFA · World Cup 2026",

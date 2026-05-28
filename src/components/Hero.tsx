@@ -8,6 +8,7 @@ import { SimulationControls } from './SimulationControls';
 import { MeshGradient } from './hero/MeshGradient';
 import { HeroGallery } from './hero/HeroGallery';
 import { HeroDemoPromo } from './hero/HeroDemoPromo';
+import { KickoffCountdown } from './hero/KickoffCountdown';
 import type { SimState } from '@/hooks/useSimulation';
 
 interface HeroProps {
@@ -104,7 +105,8 @@ export function Hero({ state, onRun }: HeroProps) {
           </div>
         </div>
 
-        <div className="relative w-full min-w-0">
+        <div className="relative flex w-full min-w-0 flex-col">
+          <KickoffCountdown className="mb-2 sm:mb-4 lg:mb-4" />
           <HeroGallery />
         </div>
       </div>

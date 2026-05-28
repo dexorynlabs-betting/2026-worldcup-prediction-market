@@ -39,6 +39,14 @@
     "progress": "{done} / {total}",
     "eta_seconds": "{seconds}s restantes"
   },
+  "countdown": {
+    "until_open": "hasta el pitazo inicial",
+    "days": "días",
+    "hours": "horas",
+    "minutes": "min",
+    "seconds": "seg",
+    "aria_label": "Cuenta regresiva al pitazo inicial del Mundial 2026"
+  },
   "gallery": {
     "trophy": "El trofeo",
     "trophy_eyebrow": "FIFA · Mundial 2026",
