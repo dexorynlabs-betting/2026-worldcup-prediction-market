@@ -1,15 +1,10 @@
 # Outliners · World Cup 2026 Analytics
 
+[English](README.md) · [简体中文](README.zh-CN.md)
+
 ## Contact
 
-**Built by [Dexorynlabs](https://t.me/dexoryn777)** · Developer: **Dexoryn**
-
-| | |
-|---|---|
-| **Telegram** | [@dexoryn777](https://t.me/dexoryn777) |
-| **X (Twitter)** | [@dexoryn](https://x.com/dexoryn) |
-
-Questions about this demo, the simulator, or integrating similar analytics for your product? Reach out on Telegram or X.
+Built by **[Dexorynlabs](https://t.me/dexoryn777)** · **Dexoryn** — questions about this demo, the simulator, or integrating similar analytics? [Telegram](https://t.me/dexoryn777) · [X @dexoryn](https://x.com/dexoryn)
 
 **Live demo:** [worldcup2026-prediction-market.vercel.app](https://worldcup2026-prediction-market.vercel.app/) · English (default) · Spanish [`/es`](https://worldcup2026-prediction-market.vercel.app/es)
 
@@ -23,7 +18,7 @@ Monte Carlo simulator and interactive analytics for the **FIFA World Cup 2026** 
 
 **Live app:** [worldcup2026-prediction-market.vercel.app](https://worldcup2026-prediction-market.vercel.app/)  
 **Run locally:** `npm run dev` → [http://localhost:3000](http://localhost:3000)  
-**Languages:** English (default) · Spanish (`/es`)
+**Languages:** English (default) · Spanish (`/es`) · [中文说明](README.zh-CN.md)
 
 ---
 
@@ -82,7 +77,7 @@ Full write-up of ELO expectancy, Poisson goals, knockout penalties (Bayesian shr
 |-------|------|
 | Framework | Next.js 15 · React 19 · TypeScript |
 | Styling | Tailwind CSS v4 (OKLCH palette, Outliners brand teal) |
-| i18n | next-intl (ES / EN) |
+| i18n | next-intl (EN / ES) |
 | Animation | GSAP · canvas-confetti |
 | Charts / viz | D3 |
 | State | Zustand (selection drawers) |
@@ -204,15 +199,14 @@ public/
 
 ## Credits & contact
 
-| | |
-|---|---|
-| **Developer** | **Dexoryn** · [Dexorynlabs](https://t.me/dexoryn777) |
-| **Telegram** | [@dexoryn777](https://t.me/dexoryn777) |
-| **X** | [@dexoryn](https://x.com/dexoryn) |
-| **ELO ratings** | [eloratings.net](https://www.eloratings.net/) |
-| **Official draw** | [FIFA World Cup 2026](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026) |
-| **Reference methodology** | [Luke Benz — World Cup simulation](https://www.youtube.com/watch?v=w5NK7bPjQkw) |
-| **Flags** | [circle-flags](https://hatscripts.github.io/circle-flags/) (MIT) |
+**Dexoryn** · [Dexorynlabs](https://t.me/dexoryn777)  
+[Telegram](https://t.me/dexoryn777) · [X @dexoryn](https://x.com/dexoryn)
+
+**Data & references**  
+ELO ratings — [eloratings.net](https://www.eloratings.net/)  
+Official draw — [FIFA World Cup 2026](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026)  
+Reference methodology — [Luke Benz — World Cup simulation](https://www.youtube.com/watch?v=w5NK7bPjQkw)  
+Flags — [circle-flags](https://hatscripts.github.io/circle-flags/) (MIT)
 
 ---
 
