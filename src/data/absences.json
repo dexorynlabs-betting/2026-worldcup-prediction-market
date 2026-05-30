@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-05-29T12:13:09.870Z",
+    "current_updated_at": "2026-05-30T10:47:31.341Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -101,13 +101,6 @@
         "minutes_qual": 0,
         "market_value_mil": 0.35,
         "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Ramy Bensebaini",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 7,
-        "reason": "Injured (flagged by transfermarkt)"
       }
     ],
     "ARG": [
@@ -175,13 +168,6 @@
       }
     ],
     "BIH": [
-      {
-        "player": "Amir Hadziahmetovic",
-        "position": "DM",
-        "minutes_qual": 0,
-        "market_value_mil": 4,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
       {
         "player": "Ivan Šunjić",
         "position": "DM",
@@ -263,13 +249,6 @@
         "position": "CB",
         "minutes_qual": 0,
         "market_value_mil": 15,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Clément Akpa",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 9,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
