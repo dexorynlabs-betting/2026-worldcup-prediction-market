@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-05-30T10:47:32.759Z",
+    "current_updated_at": "2026-05-31T10:55:48.235Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -208,13 +208,6 @@
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
-        "player": "Luc De Fougerolles",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 1,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Alphonso Davies",
         "position": "FB",
         "minutes_qual": 0,
@@ -308,38 +301,8 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "ESP": [
-      {
-        "player": "Nico Williams",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 50,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Lamine Yamal",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 200,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
-    "FRA": [
-      {
-        "player": "Warren Zaïre-Emery",
-        "position": "CM",
-        "minutes_qual": 0,
-        "market_value_mil": 60,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Ousmane Dembélé",
-        "position": "ATT",
-        "minutes_qual": 0,
-        "market_value_mil": 100,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "ESP": [],
+    "FRA": [],
     "GER": [
       {
         "player": "Manuel Neuer",
@@ -424,15 +387,7 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "NZL": [
-      {
-        "player": "Tyler Bindon",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 3.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "NZL": [],
     "PAN": [],
     "PAR": [
       {
@@ -457,31 +412,24 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "POR": [
+    "POR": [],
+    "QAT": [],
+    "RSA": [],
+    "SCO": [
       {
-        "player": "Nuno Mendes",
-        "position": "FB",
+        "player": "Billy Gilmour",
+        "position": "DM",
         "minutes_qual": 0,
-        "market_value_mil": 75,
+        "market_value_mil": 20,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "QAT": [],
-    "RSA": [],
-    "SCO": [],
     "SEN": [
       {
         "player": "Kalidou Koulibaly",
         "position": "CB",
         "minutes_qual": 0,
         "market_value_mil": 5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Ilay Camara",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 4,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
