@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-06-01T14:55:35.658Z",
+    "current_updated_at": "2026-06-02T12:38:38.939Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -119,21 +119,13 @@
       }
     ],
     "AUS": [],
-    "AUT": [
-      {
-        "player": "Patrick Wimmer",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 12,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "AUT": [],
     "BEL": [
       {
-        "player": "Romelu Lukaku",
-        "position": "ATT",
+        "player": "Zeno Debast",
+        "position": "CB",
         "minutes_qual": 0,
-        "market_value_mil": 6,
+        "market_value_mil": 28,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -142,14 +134,7 @@
         "player": "Ivan Šunjić",
         "position": "DM",
         "minutes_qual": 0,
-        "market_value_mil": 1.8,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Haris Tabakovic",
-        "position": "ATT",
-        "minutes_qual": 0,
-        "market_value_mil": 3.5,
+        "market_value_mil": 2,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -164,38 +149,10 @@
     ],
     "CAN": [
       {
-        "player": "Moïse Bombito",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 7,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Alfie Jones",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 6,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Alphonso Davies",
         "position": "FB",
         "minutes_qual": 0,
         "market_value_mil": 40,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Richie Laryea",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 1,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Marcelo Flores",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 4.5,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -240,14 +197,7 @@
         "player": "Livano Comenencia",
         "position": "FB",
         "minutes_qual": 0,
-        "market_value_mil": 0.7,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Kenji Gorré",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 0.65,
+        "market_value_mil": 0.5,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -298,7 +248,7 @@
         "player": "Youssef Amyn",
         "position": "WG",
         "minutes_qual": 0,
-        "market_value_mil": 0.6,
+        "market_value_mil": 0.55,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -321,7 +271,15 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "KSA": [],
+    "KSA": [
+      {
+        "player": "Abdullah Al-Khaibari",
+        "position": "DM",
+        "minutes_qual": 0,
+        "market_value_mil": 0.8,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "MAR": [],
     "MEX": [],
     "NED": [],
@@ -347,15 +305,7 @@
     "POR": [],
     "QAT": [],
     "RSA": [],
-    "SCO": [
-      {
-        "player": "Billy Gilmour",
-        "position": "DM",
-        "minutes_qual": 0,
-        "market_value_mil": 20,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "SCO": [],
     "SEN": [
       {
         "player": "Kalidou Koulibaly",
@@ -378,13 +328,6 @@
     "TUN": [],
     "TUR": [
       {
-        "player": "Ahmetcan Kaplan",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 7,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Ferdi Kadıoğlu",
         "position": "FB",
         "minutes_qual": 0,
@@ -392,24 +335,10 @@
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
-        "player": "Mustafa Eskihellaç",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 4,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Kenan Yıldız",
         "position": "WG",
         "minutes_qual": 0,
         "market_value_mil": 75,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Kerem Aktürkoğlu",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 20,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
