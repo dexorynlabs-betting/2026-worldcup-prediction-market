@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-06-02T12:38:38.939Z",
+    "current_updated_at": "2026-06-03T13:11:43.306Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -93,7 +93,7 @@
         "player": "Cristian Romero",
         "position": "CB",
         "minutes_qual": 0,
-        "market_value_mil": 50,
+        "market_value_mil": 45,
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
@@ -135,6 +135,13 @@
         "position": "DM",
         "minutes_qual": 0,
         "market_value_mil": 2,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Haris Tabakovic",
+        "position": "ATT",
+        "minutes_qual": 0,
+        "market_value_mil": 3.5,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -192,15 +199,7 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "CUW": [
-      {
-        "player": "Livano Comenencia",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 0.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "CUW": [],
     "CZE": [
       {
         "player": "David Zima",
@@ -234,15 +233,7 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "IRN": [
-      {
-        "player": "Alireza Jahanbakhsh",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 0.6,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "IRN": [],
     "IRQ": [
       {
         "player": "Youssef Amyn",
@@ -271,16 +262,16 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "KSA": [
+    "KSA": [],
+    "MAR": [
       {
-        "player": "Abdullah Al-Khaibari",
-        "position": "DM",
+        "player": "Zakaria El Ouahdi",
+        "position": "FB",
         "minutes_qual": 0,
-        "market_value_mil": 0.8,
+        "market_value_mil": 15,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "MAR": [],
     "MEX": [],
     "NED": [],
     "NOR": [],
@@ -331,7 +322,7 @@
         "player": "Ferdi Kadıoğlu",
         "position": "FB",
         "minutes_qual": 0,
-        "market_value_mil": 30,
+        "market_value_mil": 35,
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
@@ -344,45 +335,10 @@
     ],
     "URU": [
       {
-        "player": "Sergio Rochet",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 1.8,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Sebastián Cáceres",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 4.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Joaquín Piquerez",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 12,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Matías Viña",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 3.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
         "player": "Giorgian de Arrascaeta",
         "position": "AM",
         "minutes_qual": 0,
         "market_value_mil": 14,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Facundo Pellistri",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 6,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
