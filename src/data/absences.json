@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-06-03T13:11:43.306Z",
+    "current_updated_at": "2026-06-04T11:48:16.590Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -262,21 +262,45 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "KSA": [],
+    "KSA": [
+      {
+        "player": "Nawaf Al-Aqidi",
+        "position": "GK",
+        "minutes_qual": 0,
+        "market_value_mil": 0.65,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "MAR": [
       {
         "player": "Zakaria El Ouahdi",
         "position": "FB",
         "minutes_qual": 0,
-        "market_value_mil": 15,
+        "market_value_mil": 17,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
     "MEX": [],
-    "NED": [],
+    "NED": [
+      {
+        "player": "Jurriën Timber",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 70,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "NOR": [],
     "NZL": [],
-    "PAN": [],
+    "PAN": [
+      {
+        "player": "Luis Mejía",
+        "position": "GK",
+        "minutes_qual": 0,
+        "market_value_mil": 0.15,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "PAR": [
       {
         "player": "Fabián Balbuena",
@@ -302,7 +326,7 @@
         "player": "Kalidou Koulibaly",
         "position": "CB",
         "minutes_qual": 0,
-        "market_value_mil": 5,
+        "market_value_mil": 4.5,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
