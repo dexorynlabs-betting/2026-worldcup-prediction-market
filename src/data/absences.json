@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-06-05T12:00:23.810Z",
+    "current_updated_at": "2026-06-06T10:54:28.793Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -170,13 +170,6 @@
         "minutes_qual": 0,
         "market_value_mil": 35,
         "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Odilon Kossounou",
-        "position": "CB",
-        "minutes_qual": 0,
-        "market_value_mil": 15,
-        "reason": "Injured (flagged by transfermarkt)"
       }
     ],
     "COD": [],
@@ -216,15 +209,7 @@
       }
     ],
     "GHA": [],
-    "HAI": [
-      {
-        "player": "Johny Placide",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 0.15,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "HAI": [],
     "IRN": [],
     "IRQ": [],
     "JOR": [],
