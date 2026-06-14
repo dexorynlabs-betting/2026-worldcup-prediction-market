@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-06-13T11:12:17.080Z",
+    "current_updated_at": "2026-06-14T11:27:23.657Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -100,32 +100,17 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "BIH": [
+    "BIH": [],
+    "BRA": [
       {
-        "player": "Ivan Šunjić",
-        "position": "DM",
+        "player": "Neymar",
+        "position": "AM",
         "minutes_qual": 0,
-        "market_value_mil": 2,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Haris Tabakovic",
-        "position": "ATT",
-        "minutes_qual": 0,
-        "market_value_mil": 3.5,
+        "market_value_mil": 8,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "BRA": [],
-    "CAN": [
-      {
-        "player": "Alphonso Davies",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 40,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "CAN": [],
     "CIV": [
       {
         "player": "Evan Ndicka",
@@ -149,7 +134,15 @@
     "GER": [],
     "GHA": [],
     "HAI": [],
-    "IRN": [],
+    "IRN": [
+      {
+        "player": "Roozbeh Cheshmi",
+        "position": "DM",
+        "minutes_qual": 0,
+        "market_value_mil": 0.45,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "IRQ": [],
     "JOR": [],
     "JPN": [
@@ -172,13 +165,6 @@
         "position": "DM",
         "minutes_qual": 0,
         "market_value_mil": 0.75,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Koki Kumasaka",
-        "position": "DM",
-        "minutes_qual": 0,
-        "market_value_mil": 0.125,
         "reason": "Injured (flagged by transfermarkt)"
       },
       {
@@ -205,41 +191,10 @@
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
-    "KSA": [
-      {
-        "player": "Nawaf Al-Aqidi",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 0.65,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
-    "MAR": [
-      {
-        "player": "Anass Salah-Eddine",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 12,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Noussair Mazraoui",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 18,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "KSA": [],
+    "MAR": [],
     "MEX": [],
-    "NED": [
-      {
-        "player": "Bart Verbruggen",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 40,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "NED": [],
     "NOR": [],
     "NZL": [],
     "PAN": [
@@ -272,13 +227,6 @@
         "minutes_qual": 0,
         "market_value_mil": 0.9,
         "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Damián Bobadilla",
-        "position": "CM",
-        "minutes_qual": 0,
-        "market_value_mil": 6,
-        "reason": "Injured (flagged by transfermarkt)"
       }
     ],
     "POR": [],
@@ -295,17 +243,45 @@
       }
     ],
     "SUI": [],
-    "SWE": [],
-    "TUN": [],
-    "TUR": [
+    "SWE": [
       {
-        "player": "Kenan Yıldız",
+        "player": "Oliver Dovin",
+        "position": "GK",
+        "minutes_qual": 0,
+        "market_value_mil": 2.5,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Emil Holm",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 7,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Emil Krafth",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 2.5,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Emil Forsberg",
         "position": "WG",
         "minutes_qual": 0,
-        "market_value_mil": 75,
+        "market_value_mil": 4.5,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Gustav Lundgren",
+        "position": "WG",
+        "minutes_qual": 0,
+        "market_value_mil": 0.9,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
+    "TUN": [],
+    "TUR": [],
     "URU": [
       {
         "player": "Giorgian de Arrascaeta",
