@@ -16,7 +16,7 @@
     },
     "historical_note": "Historical seed restricted to OUT-FROM-START cases that are publicly documented. Partial absences (injuries mid-tournament) are noted but excluded from calibration to keep the signal clean.",
     "compiled_at": "2026-05-17",
-    "current_updated_at": "2026-06-14T11:27:23.657Z",
+    "current_updated_at": "2026-06-15T15:00:30.717Z",
     "current_source": "transfermarkt squad pages (injury flag)"
   },
   "historical": {
@@ -103,10 +103,52 @@
     "BIH": [],
     "BRA": [
       {
-        "player": "Neymar",
-        "position": "AM",
+        "player": "Éder Militão",
+        "position": "CB",
         "minutes_qual": 0,
-        "market_value_mil": 8,
+        "market_value_mil": 40,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Caio Henrique",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 18,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Luciano Juba",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 3,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Wesley",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 9,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Rodrygo",
+        "position": "WG",
+        "minutes_qual": 0,
+        "market_value_mil": 100,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Estêvão",
+        "position": "WG",
+        "minutes_qual": 0,
+        "market_value_mil": 50,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Vitor Roque",
+        "position": "ATT",
+        "minutes_qual": 0,
+        "market_value_mil": 20,
         "reason": "Injured (flagged by transfermarkt)"
       }
     ],
@@ -126,7 +168,29 @@
     "CRO": [],
     "CUW": [],
     "CZE": [],
-    "ECU": [],
+    "ECU": [
+      {
+        "player": "Jhoanner Chávez",
+        "position": "FB",
+        "minutes_qual": 0,
+        "market_value_mil": 4,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Patrik Mercado",
+        "position": "AM",
+        "minutes_qual": 0,
+        "market_value_mil": 0.75,
+        "reason": "Injured (flagged by transfermarkt)"
+      },
+      {
+        "player": "Leonardo Campana",
+        "position": "ATT",
+        "minutes_qual": 0,
+        "market_value_mil": 3.5,
+        "reason": "Injured (flagged by transfermarkt)"
+      }
+    ],
     "EGY": [],
     "ENG": [],
     "ESP": [],
@@ -243,43 +307,7 @@
       }
     ],
     "SUI": [],
-    "SWE": [
-      {
-        "player": "Oliver Dovin",
-        "position": "GK",
-        "minutes_qual": 0,
-        "market_value_mil": 2.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Emil Holm",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 7,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Emil Krafth",
-        "position": "FB",
-        "minutes_qual": 0,
-        "market_value_mil": 2.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Emil Forsberg",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 4.5,
-        "reason": "Injured (flagged by transfermarkt)"
-      },
-      {
-        "player": "Gustav Lundgren",
-        "position": "WG",
-        "minutes_qual": 0,
-        "market_value_mil": 0.9,
-        "reason": "Injured (flagged by transfermarkt)"
-      }
-    ],
+    "SWE": [],
     "TUN": [],
     "TUR": [],
     "URU": [
